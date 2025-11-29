@@ -1,0 +1,358 @@
+/**
+ * src/js/app.js
+ * 메인 애플리케이션 진입점
+ */
+
+import { DefaultSettings, STORAGE_KEYS } from './config.js';
+import { Storage } from './data/storage.js';
+import { AirportDataImporter } from './data/importer.js';
+import { SampleForecast } from './data/sampleData.js';
+import { calculateAllRequirements } from './core/calculator.js';
+import { Dashboard } from './ui/dashboard.js';
+import { StaffUI } from './ui/staff.js';
+
+// --- EventBus Implementation ---
+class EventBus {
+  constructor() {
+    this.listeners = {};
+  }
+
+  on(event, callback) {
+    if (!this.listeners[event]) {
+      this.listeners[event] = [];
+    }
+    this.listeners[event].push(callback);
+    return () => {
+      this.listeners[event] = this.listeners[event].filter(cb => cb !== callback);
+    };
+  }
+
+  emit(event, data) {
+    if (this.listeners[event]) {
+      this.listeners[event].forEach(callback => callback(data));
+    }
+  }
+}
+
+// --- Main App Class ---
+class App {
+  constructor() {
+    this.eventBus = new EventBus();
+    this.dashboard = new Dashboard(this.eventBus);
+    this.staffUI = new StaffUI(this.eventBus);
+
+    this.state = {
+      settings: DefaultSettings,
+      forecast: null,
+      requirement: null,
+      staffList: []
+    };
+
+    window.iqmApp = this;
+  }
+
+  async init() {
+    try {
+      console.log('IQM App Initializing...');
+
+      // 1. 설정 로드
+      const savedSettings = Storage.load(STORAGE_KEYS.SETTINGS);
+      if (savedSettings) {
+        this.state.settings = { ...DefaultSettings, ...savedSettings };
+      }
+
+      // 테마 적용
+      document.documentElement.setAttribute('data-theme', this.state.settings.theme || 'dark');
+
+      // 2. UI 초기화
+      this.dashboard.init();
+
+      // 3. 이벤트 바인딩
+      this.bindEvents();
+
+      // 4. 데이터 로드
+      const savedForecast = Storage.load(STORAGE_KEYS.CURRENT_FORECAST);
+      if (savedForecast) {
+        console.log('Loaded saved forecast');
+        this.updateForecast(savedForecast);
+      } else {
+        console.log('Loading sample data');
+        this.updateForecast(SampleForecast);
+      }
+
+      console.log('App initialized successfully');
+    } catch (err) {
+      console.error('App initialization failed:', err);
+    }
+  }
+
+  bindEvents() {
+    // 설정 버튼
+    const settingsBtn = document.getElementById('settings-btn');
+    if (settingsBtn) {
+      settingsBtn.addEventListener('click', () => {
+        this.dashboard.switchView('settings');
+        // 네비게이션 활성화 업데이트
+        document.querySelectorAll('.nav-item').forEach(nav => {
+          nav.classList.toggle('active', nav.dataset.view === 'settings');
+        });
+      });
+    }
+
+    // Staff Updates (New)
+    this.eventBus.on('staff:updated', (updatedList) => {
+      this.state.staffList = updatedList;
+      Storage.save(STORAGE_KEYS.STAFF, updatedList);
+      this.staffUI.setStaffList(updatedList);
+      // Also update dashboard if needed (for assignment dropdowns)
+      this.dashboard.updateStaffList(updatedList);
+    });
+
+    // Staff Assignment from Dashboard (New)
+    this.eventBus.on('staff:assign', ({ staffId, type, zone, booth }) => {
+      const staffIndex = this.state.staffList.findIndex(s => s.id === staffId);
+      if (staffIndex !== -1) {
+        // Clear previous assignment if any
+        // const oldAssignment = this.state.staffList[staffIndex].assignment; // Not used in this snippet
+
+        // Update staff status
+        this.state.staffList[staffIndex].status = 'assigned';
+        this.state.staffList[staffIndex].assignment = { type, zone, booth };
+
+        // If staff was assigned elsewhere, we might need to clear that booth?
+        // For now, assume UI handles "stealing" or we just update the record.
+
+        Storage.save(STORAGE_KEYS.STAFF, this.state.staffList);
+        this.staffUI.setStaffList(this.state.staffList);
+        this.dashboard.updateStaffList(this.state.staffList);
+      }
+    });
+
+    this.eventBus.on('staff:unassign', ({ staffId }) => {
+      const staffIndex = this.state.staffList.findIndex(s => s.id === staffId);
+      if (staffIndex !== -1) {
+        this.state.staffList[staffIndex].status = 'idle';
+        this.state.staffList[staffIndex].assignment = null;
+
+        Storage.save(STORAGE_KEYS.STAFF, this.state.staffList);
+        this.staffUI.setStaffList(this.state.staffList);
+        this.dashboard.updateStaffList(this.state.staffList);
+      }
+    });
+
+    // 파일 업로드
+    const fileInput = document.getElementById('csv-upload');
+    const uploadBtn = document.getElementById('btn-upload-file');
+
+    if (uploadBtn && fileInput) {
+      uploadBtn.addEventListener('click', () => {
+        fileInput.click();
+      });
+
+      fileInput.addEventListener('change', async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        try {
+          const forecast = await AirportDataImporter.importFromFile(file);
+          this.updateForecast(forecast);
+          alert('데이터를 성공적으로 불러왔습니다.');
+          this.dashboard.switchView('dashboard');
+          this.updateActiveNav('dashboard');
+        } catch (error) {
+          console.error(error);
+          alert(`데이터 불러오기 실패: ${error.message}`);
+        }
+        e.target.value = '';
+      });
+    }
+
+    // Date Picker Initialization
+    const dateInput = document.getElementById('fetch-date');
+    if (dateInput) {
+      const today = new Date();
+      const maxDate = new Date();
+      maxDate.setDate(today.getDate() + 2); // +2 days
+
+      // Use local time for YYYY-MM-DD format
+      const formatDate = (d) => {
+        const year = d.getFullYear();
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+      };
+
+      dateInput.value = formatDate(today);
+      dateInput.min = formatDate(today);
+      dateInput.max = formatDate(maxDate);
+    }
+
+    // API 데이터 가져오기 버튼
+    const fetchBtn = document.getElementById('btn-fetch-api');
+    if (fetchBtn) {
+      fetchBtn.addEventListener('click', async () => {
+        try {
+          const originalText = fetchBtn.innerHTML;
+          fetchBtn.disabled = true;
+          fetchBtn.innerHTML = '<span class="btn-icon">⏳</span><span>Loading...</span>';
+
+          let selectedDate = null;
+          if (dateInput) {
+            selectedDate = dateInput.value.replace(/-/g, ''); // YYYYMMDD format
+          }
+
+          const forecast = await AirportDataImporter.fetchFromApi(selectedDate);
+          this.updateForecast(forecast);
+          alert('인천공항 실시간 데이터를 성공적으로 가져왔습니다.');
+
+          this.dashboard.switchView('dashboard');
+          this.updateActiveNav('dashboard');
+        } catch (error) {
+          console.error(error);
+          alert(`데이터 가져오기 실패: ${error.message}\n서버가 실행 중인지 확인해주세요.`);
+        } finally {
+          fetchBtn.disabled = false;
+          fetchBtn.innerHTML = '<span class="btn-icon">🔄</span><span>Fetch Live Data</span>';
+        }
+      });
+    }
+
+    // 샘플 데이터 버튼
+    const sampleBtn = document.getElementById('btn-sample-data');
+    if (sampleBtn) {
+      sampleBtn.addEventListener('click', () => {
+        this.updateForecast(SampleForecast);
+        alert('샘플 데이터가 로드되었습니다.');
+        this.dashboard.switchView('dashboard');
+        document.querySelectorAll('.nav-item').forEach(nav => {
+          nav.classList.toggle('active', nav.dataset.view === 'dashboard');
+        });
+      });
+    }
+
+    // 데이터 저장 버튼
+    const saveBtn = document.getElementById('btn-save-data');
+    if (saveBtn) {
+      saveBtn.addEventListener('click', () => {
+        this.saveManualInput();
+      });
+    }
+
+    // EventBus 구독
+    this.eventBus.on('settings:changed', (newSettings) => {
+      this.state.settings = newSettings;
+      Storage.save(STORAGE_KEYS.SETTINGS, newSettings);
+
+      if (this.state.forecast) {
+        this.recalculate();
+      }
+    });
+  }
+
+  /**
+   * 수동 입력 데이터 저장
+   */
+  saveManualInput() {
+    const hourlyData = [];
+
+    for (let i = 0; i < 24; i++) {
+      const arrInput = document.getElementById(`arr-${i}`);
+      const depInput = document.getElementById(`dep-${i}`);
+
+      const arrTotal = parseInt(arrInput?.value) || 0;
+      const depTotal = parseInt(depInput?.value) || 0;
+
+      // 간단히 균등 분배 (실제로는 더 정교한 분배 필요)
+      const arrPerZone = Math.round(arrTotal / 4);
+      const depPerZone = Math.round(depTotal / 4);
+
+      hourlyData.push({
+        hour: `${String(i).padStart(2, '0')}~${String(i + 1).padStart(2, '0')}`,
+        hourStart: i,
+        arrival: {
+          AB: arrPerZone,
+          C: arrPerZone,
+          D: arrPerZone,
+          EF: arrTotal - (arrPerZone * 3),
+          total: arrTotal
+        },
+        departure: {
+          AB: depPerZone,
+          C: depPerZone,
+          D: depPerZone,
+          EF: depTotal - (depPerZone * 3),
+          total: depTotal
+        }
+      });
+    }
+
+    const forecast = {
+      id: this.generateUUID(),
+      date: new Date().toISOString().split('T')[0],
+      terminal: 'T1',
+      lastUpdated: new Date().toISOString(),
+      source: 'manual',
+      hourlyData
+    };
+
+    this.updateForecast(forecast);
+    alert('데이터가 저장되었습니다.');
+
+    // 대시보드로 전환
+    this.dashboard.switchView('dashboard');
+    document.querySelectorAll('.nav-item').forEach(nav => {
+      nav.classList.toggle('active', nav.dataset.view === 'dashboard');
+    });
+  }
+
+  updateForecast(forecast) {
+    this.state.forecast = forecast;
+    Storage.save(STORAGE_KEYS.CURRENT_FORECAST, forecast);
+
+    // Sync date picker with forecast date
+    const dateInput = document.getElementById('fetch-date');
+    if (dateInput && forecast.date) {
+      dateInput.value = forecast.date;
+    }
+
+    this.recalculate();
+  }
+
+  recalculate() {
+    if (!this.state.forecast) return;
+
+    console.log('Calculating requirements...');
+    const requirement = calculateAllRequirements(this.state.forecast, this.state.settings);
+    this.state.requirement = requirement;
+
+    Storage.save(STORAGE_KEYS.CURRENT_REQUIREMENT, requirement);
+    this.dashboard.render(requirement);
+    this.dashboard.updateManualInputTable(requirement);
+  }
+
+  updateActiveNav(viewName) {
+    document.querySelectorAll('.nav-item').forEach(nav => {
+      nav.classList.toggle('active', nav.dataset.view === viewName);
+    });
+  }
+
+  generateUUID() {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+      const r = Math.random() * 16 | 0;
+      const v = c === 'x' ? r : (r & 0x3 | 0x8);
+      return v.toString(16);
+    });
+  }
+}
+
+// --- Bootstrap ---
+const app = new App();
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => app.init());
+} else {
+  app.init();
+}
+
+// 전역 접근 (디버깅용)
+window.iqmApp = app;

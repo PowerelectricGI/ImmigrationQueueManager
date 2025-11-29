@@ -1,0 +1,87 @@
+/* src/css/variables.css */
+:root {
+  /* 색상 - 다크 테마 (기본) */
+  --color-bg-primary: #0d1117;
+  --color-bg-secondary: #161b22;
+  --color-bg-card: #1c2128;
+  --color-bg-input: #2d333b;
+  --color-bg-hover: #2d333b;
+
+  --color-text-primary: #e6edf3;
+  --color-text-secondary: #8b949e;
+  --color-text-muted: #6e7681;
+
+  --color-accent: #e94560;
+  --color-accent-light: #ff6b81;
+  --color-success: #4ade80;
+  --color-info: #58a6ff;
+
+  /* 경보 색상 */
+  --color-alert-blue: #3b82f6;
+  --color-alert-yellow: #fbbf24;
+  --color-alert-orange: #f97316;
+  --color-alert-red: #ef4444;
+
+  /* 차트 색상 */
+  --color-chart-arrival: #ef4444;
+  --color-chart-departure: #f97316;
+  --color-chart-staff: #fbbf24;
+
+  /* 타이포그래피 */
+  --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans KR', sans-serif;
+  --font-size-xs: 0.7rem;
+  --font-size-sm: 0.8rem;
+  --font-size-base: 0.9rem;
+  --font-size-lg: 1rem;
+  --font-size-xl: 1.2rem;
+  --font-size-2xl: 1.4rem;
+  --font-size-3xl: 1.8rem;
+
+  /* 간격 */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 0.75rem;
+  --spacing-lg: 1rem;
+  --spacing-xl: 1.5rem;
+
+  /* 반경 */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-full: 9999px;
+
+  /* 그림자 */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.5);
+
+  /* 트랜지션 */
+  --transition-fast: 150ms ease;
+  --transition-base: 300ms ease;
+
+  /* 터치 타겟 */
+  --touch-target-min: 44px;
+
+  /* Z-index */
+  --z-dropdown: 10;
+  --z-modal: 9999;
+  --z-toast: 10000;
+
+  /* Border */
+  --border-color: #30363d;
+}
+
+/* 라이트 테마 */
+[data-theme="light"] {
+  --color-bg-primary: #f6f8fa;
+  --color-bg-secondary: #ffffff;
+  --color-bg-card: #ffffff;
+  --color-bg-input: #f3f4f6;
+  --color-bg-hover: #f3f4f6;
+
+  --color-text-primary: #24292f;
+  --color-text-secondary: #57606a;
+  --color-text-muted: #8b949e;
+
+  --border-color: #d0d7de;
+}
