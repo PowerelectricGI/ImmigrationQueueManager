@@ -180,16 +180,35 @@ export class AirportDataImporter {
                 throw new Error(data.error);
             }
 
-            // 서버에서 이미 파싱된 JSON을 반환하므로 그대로 사용하되,
-            // 클라이언트 앱에서 사용하는 ID 등을 보강
             return {
                 ...data,
                 id: generateUUID(),
                 source: 'api'
             };
         } catch (error) {
-            console.error('API Fetch Error:', error);
-            throw error;
+            console.warn('API Fetch failed, trying static data...', error);
+
+            // Fallback to static data (GitHub Pages support)
+            try {
+                // Adjust path based on where index.html is served. 
+                // Assuming index.html is in src/, data is in src/data/
+                const staticResponse = await fetch('data/latest_data.json');
+                if (!staticResponse.ok) {
+                    throw new Error('Static data not found');
+                }
+                const staticData = await staticResponse.json();
+
+                // If user requested a specific date, we should warn them that this is static data
+                // But for now, just return what we have
+                return {
+                    ...staticData,
+                    id: generateUUID(),
+                    source: 'static'
+                };
+            } catch (staticError) {
+                console.error('Static Data Fetch Error:', staticError);
+                throw error; // Throw original error if both fail
+            }
         }
     }
 }
