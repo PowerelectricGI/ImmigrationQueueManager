@@ -191,8 +191,8 @@ export class AirportDataImporter {
             // Fallback to static data (GitHub Pages support)
             try {
                 // Adjust path based on where index.html is served. 
-                // Assuming index.html is in src/, data is in src/data/
-                const staticResponse = await fetch('data/latest_data.json');
+                // index.html is at root, data is in src/data/
+                const staticResponse = await fetch('src/data/latest_data.json');
                 if (!staticResponse.ok) {
                     throw new Error('Static data not found');
                 }
