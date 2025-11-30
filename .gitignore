@@ -68,3 +68,4 @@ package-lock.json
 yarn.lock
 
 !src/js/lib/
+Supa.txt
