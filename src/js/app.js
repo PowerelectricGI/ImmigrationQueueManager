@@ -59,11 +59,20 @@ class App {
     try {
       console.log('IQM App Initializing...');
 
-      // 1. 설정 로드
-      const savedSettings = Storage.load(STORAGE_KEYS.SETTINGS);
-      if (savedSettings) {
-        this.state.settings = { ...DefaultSettings, ...savedSettings };
+      // 1. 설정 로드 (Local + Remote)
+      const localSettings = Storage.load(STORAGE_KEYS.SETTINGS);
+      if (localSettings) {
+        this.state.settings = { ...DefaultSettings, ...localSettings };
       }
+
+      // Supabase 최신 설정 가져오기
+      Storage.fetchLatest(STORAGE_KEYS.SETTINGS).then(remoteSettings => {
+        if (remoteSettings) {
+          console.log('Remote settings loaded');
+          this.state.settings = { ...DefaultSettings, ...remoteSettings };
+          this.eventBus.emit('settings:changed', this.state.settings);
+        }
+      });
 
       // 테마 적용
       document.documentElement.setAttribute('data-theme', this.state.settings.theme || 'dark');
@@ -84,14 +93,44 @@ class App {
         this.updateForecast(SampleForecast);
       }
 
-      // 5. 직원 데이터 로드 (New)
-      const savedStaff = Storage.load(STORAGE_KEYS.STAFF);
-      if (savedStaff && Array.isArray(savedStaff)) {
-        console.log('Loaded saved staff list', savedStaff.length);
-        this.state.staffList = savedStaff;
-        this.staffUI.setStaffList(savedStaff);
-        this.dashboard.updateStaffList(savedStaff);
+      // 5. 직원 데이터 로드 (Local + Remote)
+      const localStaff = Storage.load(STORAGE_KEYS.STAFF);
+      if (localStaff && Array.isArray(localStaff)) {
+        this.state.staffList = localStaff;
+        this.staffUI.setStaffList(localStaff);
+        this.dashboard.updateStaffList(localStaff);
       }
+
+      // Supabase 최신 직원 목록 가져오기
+      Storage.fetchLatest(STORAGE_KEYS.STAFF).then(remoteStaff => {
+        if (remoteStaff && Array.isArray(remoteStaff)) {
+          console.log('Remote staff list loaded', remoteStaff.length);
+          this.state.staffList = remoteStaff;
+          this.staffUI.setStaffList(remoteStaff);
+          this.dashboard.updateStaffList(remoteStaff);
+          // LocalStorage 동기화
+          Storage.save(STORAGE_KEYS.STAFF, remoteStaff);
+        }
+      });
+
+      // 6. 실시간 구독 시작
+      Storage.subscribe(
+        (updatedStaffList) => {
+          console.log('Realtime update: Staff list');
+          this.state.staffList = updatedStaffList;
+          this.staffUI.setStaffList(updatedStaffList);
+          this.dashboard.updateStaffList(updatedStaffList);
+          // Update local cache without triggering save loop (Storage.save handles this gracefully usually, but be careful)
+          localStorage.setItem(STORAGE_KEYS.STAFF, JSON.stringify(updatedStaffList));
+        },
+        (updatedSettings) => {
+          console.log('Realtime update: Settings');
+          this.state.settings = updatedSettings;
+          this.eventBus.emit('settings:changed', updatedSettings); // This might trigger save loop?
+          // Update local cache
+          localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(updatedSettings));
+        }
+      );
 
       console.log('App initialized successfully');
     } catch (err) {
