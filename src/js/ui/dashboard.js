@@ -52,15 +52,109 @@ export class Dashboard {
 
     // Booth Click Delegation
     document.addEventListener('click', (e) => {
-      const target = e.target.closest('.booth-trigger');
-      if (target) {
-        const type = target.dataset.type;
-        const zone = target.dataset.zone;
-        const booth = parseInt(target.dataset.booth);
+      // Booth Trigger
+      const boothTarget = e.target.closest('.booth-trigger');
+      if (boothTarget) {
+        const type = boothTarget.dataset.type;
+        const zone = boothTarget.dataset.zone;
+        const booth = parseInt(boothTarget.dataset.booth);
         this.handleBoothClick(type, zone, booth);
+        return;
+      }
+
+      // Zone Card Trigger
+      const zoneTarget = e.target.closest('.zone-card-trigger');
+      if (zoneTarget) {
+        const type = zoneTarget.dataset.type;
+        const zone = zoneTarget.dataset.zone;
+        this.handleZoneClick(type, zone);
       }
     });
 
+  }
+
+  /**
+   * Handle Zone Card Click
+   */
+  handleZoneClick(type, zoneId) {
+    console.log(`Zone Clicked: ${type} - ${zoneId}`);
+    if (!this.requirement || !this.requirement.hourlyRequirement) return;
+
+    const hourlyData = this.requirement.hourlyRequirement.map(data => {
+      const zoneData = type === 'arrival' ? data.arrival[zoneId] : data.departure[zoneId];
+      return {
+        hour: data.hour,
+        hourStart: data.hourStart,
+        passengers: zoneData?.passengers || 0,
+        required: zoneData?.required || 0
+      };
+    });
+
+    this.openZoneDetailModal(type, zoneId, hourlyData);
+  }
+
+  /**
+   * Open Zone Detail Modal
+   */
+  openZoneDetailModal(type, zoneId, hourlyData) {
+    const modalContainer = document.getElementById('modal-container');
+    if (!modalContainer) return;
+
+    const zoneLabels = type === 'arrival'
+      ? { AB: 'A,B 구역', C: 'C 구역', D: 'D 구역', EF: 'E,F 구역' }
+      : { AB: '1,2 구역', C: '3 구역', D: '4 구역', EF: '5,6 구역' };
+
+    const title = `${type === 'arrival' ? '입국' : '출국'} ${zoneLabels[zoneId]} 시간대별 현황`;
+
+    let tableRows = hourlyData.map(d => `
+      <tr>
+        <td style="padding: 0.5rem; border-bottom: 1px solid var(--border-color);">${d.hour}</td>
+        <td style="padding: 0.5rem; border-bottom: 1px solid var(--border-color); text-align: right;">${d.passengers.toLocaleString()}명</td>
+        <td style="padding: 0.5rem; border-bottom: 1px solid var(--border-color); text-align: right;">${d.required}명</td>
+      </tr>
+    `).join('');
+
+    const modalHTML = `
+      <div class="modal-overlay" id="zone-modal-overlay">
+        <div class="modal-content" style="max-width: 500px;">
+          <div class="modal-header">
+            <div class="modal-title">${title}</div>
+            <div class="modal-close" id="modal-close-btn">×</div>
+          </div>
+          <div class="modal-body" style="max-height: 60vh; overflow-y: auto;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem;">
+              <thead>
+                <tr style="background: rgba(255,255,255,0.05);">
+                  <th style="padding: 0.5rem; text-align: left;">시간</th>
+                  <th style="padding: 0.5rem; text-align: right;">승객수</th>
+                  <th style="padding: 0.5rem; text-align: right;">필요 인원</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${tableRows}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    `;
+
+    modalContainer.innerHTML = modalHTML;
+
+    // Bind Close Events
+    const overlay = document.getElementById('zone-modal-overlay');
+    const closeBtn = document.getElementById('modal-close-btn');
+
+    const closeModal = () => {
+      modalContainer.innerHTML = '';
+    };
+
+    if (closeBtn) closeBtn.addEventListener('click', closeModal);
+    if (overlay) {
+      overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) closeModal();
+      });
+    }
   }
 
   /**

@@ -6,9 +6,9 @@
 /**
  * 구역 카드 컴포넌트 (이미지 디자인 기반)
  */
-export function ZoneCard({ zoneName, passengers, required, onClick }) {
+export function ZoneCard({ zoneName, passengers, required, zoneId, type }) {
   return `
-    <div class="zone-card" ${onClick ? `onclick="${onClick}"` : ''}>
+    <div class="zone-card zone-card-trigger" data-zone="${zoneId}" data-type="${type}" style="cursor: pointer;">
       <div class="zone-card-left">
         <div class="zone-name">${zoneName}</div>
         <div class="zone-passengers">${passengers.toLocaleString()}<span class="unit">명</span></div>
@@ -36,7 +36,9 @@ export function ZoneCardList(zones, type) {
     return ZoneCard({
       zoneName: zoneLabels[key],
       passengers: zone.passengers,
-      required: zone.required
+      required: zone.required,
+      zoneId: key,
+      type: type
     });
   }).join('');
 }
