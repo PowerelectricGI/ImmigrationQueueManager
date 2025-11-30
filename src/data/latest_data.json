@@ -1,17 +1,17 @@
 {
   "date": "2025-11-30",
   "terminal": "T1",
-  "lastUpdated": "2025-11-30T14:16:53.079758",
+  "lastUpdated": "2025-11-30T15:12:25.333608",
   "hourlyData": [
     {
       "hour": "00~01",
       "hourStart": 0,
       "arrival": {
-        "AB": 467,
+        "AB": 308,
         "C": 0,
         "D": 0,
         "EF": 0,
-        "total": 467
+        "total": 308
       },
       "departure": {
         "AB": 0,
@@ -376,9 +376,9 @@
       "departure": {
         "AB": 303,
         "C": 0,
-        "D": 867,
+        "D": 868,
         "EF": 0,
-        "total": 1170
+        "total": 1171
       }
     },
     {
@@ -392,11 +392,11 @@
         "total": 3596
       },
       "departure": {
-        "AB": 226,
+        "AB": 230,
         "C": 0,
-        "D": 491,
+        "D": 546,
         "EF": 0,
-        "total": 717
+        "total": 776
       }
     },
     {
@@ -412,9 +412,9 @@
       "departure": {
         "AB": 0,
         "C": 0,
-        "D": 168,
+        "D": 595,
         "EF": 0,
-        "total": 168
+        "total": 595
       }
     },
     {
@@ -430,9 +430,9 @@
       "departure": {
         "AB": 0,
         "C": 0,
-        "D": 2,
+        "D": 426,
         "EF": 0,
-        "total": 2
+        "total": 426
       }
     }
   ]
