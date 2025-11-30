@@ -211,15 +211,23 @@ export class BrowserDataFetcher {
         let lastError = null;
 
         // 각 프록시를 순차적으로 시도
+        const timestamp = new Date().getTime(); // Cache buster
+
         for (const proxy of enabledProxies) {
-            const proxyUrl = proxy.url + encodeURIComponent(targetUrl);
+            // Append timestamp to the original URL or the proxy URL to ensure uniqueness
+            const separator = targetUrl.includes('?') ? '&' : '?';
+            const urlWithCacheBuster = `${targetUrl}${separator}_t=${timestamp}`;
+
+            const proxyUrl = proxy.url + encodeURIComponent(urlWithCacheBuster);
             console.log(`Fetching via ${proxy.name}: ${proxyUrl}`);
 
             try {
                 const response = await fetch(proxyUrl, {
                     method: 'GET',
                     headers: {
-                        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
+                        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+                        'Cache-Control': 'no-cache',
+                        'Pragma': 'no-cache'
                     }
                 });
 
@@ -228,7 +236,7 @@ export class BrowserDataFetcher {
                 }
 
                 const html = await response.text();
-                
+
                 // HTML이 너무 짧으면 실패로 간주
                 if (html.length < 1000) {
                     throw new Error('Response too short, likely blocked or error page');
