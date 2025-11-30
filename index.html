@@ -68,59 +68,45 @@
           필요</span>
       </div>
     </div>
-
-    <!-- Departure Detail View -->
-    <div id="view-departure" class="view-container hidden">
-      <!-- Date & Peak Alert Section (Duplicated for Departure) -->
-      <section class="selector-section">
-        <div class="date-selector" id="date-selector-dep">
-          <div class="date-selector-row">
-            <span class="date-icon">📅</span>
-            <span class="date-text" id="current-date-dep">2024-01-15 (화)</span>
-          </div>
-          <div class="terminal-badge" id="terminal-info-dep">제1여객터미널</div>
-        </div>
-
-        <div class="peak-alert-card" id="peak-alert-dep">
-          <div class="peak-alert-header">
-            <span class="peak-alert-icon">⚠️</span>
-            <span class="peak-alert-title" id="peak-time-dep">08:00 피크 예상</span>
-          </div>
-          <div class="peak-alert-details">
-            <div class="peak-alert-row">
-              입국: <span id="peak-arrival-pax-dep">4,573</span>명 → <span class="highlight"
-                id="peak-arrival-staff-dep">8명</span>
-            </div>
-            <div class="peak-alert-row">
-              출국: <span id="peak-departure-pax-dep">5,970</span>명 → <span class="highlight"
-                id="peak-departure-staff-dep">10명</span>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- Departure Chart Section -->
-      <section class="chart-section">
-        <div class="chart-container">
-          <canvas id="departure-chart"></canvas>
-        </div>
-        <div class="chart-legend">
-          <div class="chart-legend-item">
-            <span class="legend-color arrival"
-              style="background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);"></span>
-            <span>승객 수</span>
-          </div>
-          <div class="chart-legend-item">
-            <span class="legend-color staff"></span>
-            <span>필요 심사관</span>
-          </div>
-        </div>
-      </section>
-      <div class="zone-detail-list" id="departure-zone-list"></div>
-      <div class="zone-total" id="departure-total">
-        <span class="zone-total-text">합계: <span class="pax">5,970</span>명 / <span class="staff">12명</span>
-          필요</span>
+    <div class="peak-alert-header">
+      <span class="peak-alert-icon">⚠️</span>
+      <span class="peak-alert-title" id="peak-time-dep">08:00 피크 예상</span>
+    </div>
+    <div class="peak-alert-details">
+      <div class="peak-alert-row">
+        입국: <span id="peak-arrival-pax-dep">4,573</span>명 → <span class="highlight"
+          id="peak-arrival-staff-dep">8명</span>
       </div>
+      <div class="peak-alert-row">
+        출국: <span id="peak-departure-pax-dep">5,970</span>명 → <span class="highlight"
+          id="peak-departure-staff-dep">10명</span>
+      </div>
+    </div>
+    </div>
+    </section>
+
+    <!-- Departure Chart Section -->
+    <section class="chart-section">
+      <div class="chart-container">
+        <canvas id="departure-chart"></canvas>
+      </div>
+      <div class="chart-legend">
+        <div class="chart-legend-item">
+          <span class="legend-color arrival"
+            style="background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);"></span>
+          <span>승객 수</span>
+        </div>
+        <div class="chart-legend-item">
+          <span class="legend-color staff"></span>
+          <span>필요 심사관</span>
+        </div>
+      </div>
+    </section>
+    <div class="zone-detail-list" id="departure-zone-list"></div>
+    <div class="zone-total" id="departure-total">
+      <span class="zone-total-text">합계: <span class="pax">5,970</span>명 / <span class="staff">12명</span>
+        필요</span>
+    </div>
     </div>
 
     <!-- Data Input View -->
