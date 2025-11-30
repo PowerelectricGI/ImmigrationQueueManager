@@ -84,6 +84,15 @@ class App {
         this.updateForecast(SampleForecast);
       }
 
+      // 5. 직원 데이터 로드 (New)
+      const savedStaff = Storage.load(STORAGE_KEYS.STAFF);
+      if (savedStaff && Array.isArray(savedStaff)) {
+        console.log('Loaded saved staff list', savedStaff.length);
+        this.state.staffList = savedStaff;
+        this.staffUI.setStaffList(savedStaff);
+        this.dashboard.updateStaffList(savedStaff);
+      }
+
       console.log('App initialized successfully');
     } catch (err) {
       console.error('App initialization failed:', err);
@@ -159,12 +168,12 @@ class App {
 
         try {
           const forecast = await AirportDataImporter.importFromFile(file);
-          
+
           // 먼저 뷰를 전환한 후 데이터 업데이트 (렌더링 순서 보장)
           this.dashboard.switchView('arrival');
           this.updateActiveNav('arrival');
           this.updateForecast(forecast);
-          
+
           alert('데이터를 성공적으로 불러왔습니다.');
         } catch (error) {
           console.error(error);
@@ -209,12 +218,12 @@ class App {
           }
 
           const forecast = await AirportDataImporter.fetchFromApi(selectedDate);
-          
+
           // 먼저 뷰를 전환한 후 데이터 업데이트 (렌더링 순서 보장)
           this.dashboard.switchView('arrival');
           this.updateActiveNav('arrival');
           this.updateForecast(forecast);
-          
+
           alert('인천공항 실시간 데이터를 성공적으로 가져왔습니다.');
         } catch (error) {
           console.error(error);
@@ -345,7 +354,7 @@ class App {
     this.dashboard.switchView('arrival');
     this.updateActiveNav('arrival');
     this.updateForecast(forecast);
-    
+
     alert('데이터가 저장되었습니다.');
   }
 
