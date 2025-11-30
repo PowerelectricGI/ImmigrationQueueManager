@@ -35,10 +35,42 @@ export const Storage = {
                     }));
 
                     const { error: upsertError } = await supabase
-                    id: 'global_settings',
+                        .from('staff')
+                        .upsert(updates);
+
+                    if (upsertError) throw upsertError;
+
+                    // 2. Delete (Sync: Remove items not in the current list)
+                    // 'not.in' filter can be brittle. Instead, we fetch remote IDs and delete the diff.
+                    const { data: remoteStaff, error: fetchError } = await supabase
+                        .from('staff')
+                        .select('id');
+
+                    if (fetchError) throw fetchError;
+
+                    const remoteIds = remoteStaff.map(r => r.id);
+                    const localIds = data.map(s => s.id);
+
+                    // Find IDs that are in DB but not in our new list
+                    const idsToDelete = remoteIds.filter(id => !localIds.includes(id));
+
+                    if (idsToDelete.length > 0) {
+                        const { error: deleteError } = await supabase
+                            .from('staff')
+                            .delete()
+                            .in('id', idsToDelete);
+
+                        if (deleteError) throw deleteError;
+                    }
+                }
+            } else if (key === STORAGE_KEYS.SETTINGS) {
+                const { error } = await supabase
+                    .from('settings')
+                    .upsert({
+                        id: 'global_settings',
                         config: data,
-                            updated_at: new Date().toISOString()
-                });
+                        updated_at: new Date().toISOString()
+                    });
 
                 if (error) throw error;
             }
