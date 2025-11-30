@@ -20,12 +20,16 @@ export class BrowserDataFetcher {
      * - 장점: 안정적, 무료
      * - 단점: 속도 제한 있음
      *
-     * 옵션 2: CORS Anywhere (백업)
+     * 옵션 2: Corsproxy.io
+     * - URL: https://corsproxy.io/?
+     * - 장점: 빠름, 무료
+     *
+     * 옵션 3: CORS Anywhere (백업)
      * - URL: https://cors-anywhere.herokuapp.com/
      * - 장점: 간단
      * - 단점: 사용 전 활성화 필요 (https://cors-anywhere.herokuapp.com/corsdemo)
      *
-     * 옵션 3: 직접 호스팅
+     * 옵션 4: 직접 호스팅
      * - 자체 CORS 프록시 서버 운영
      */
     static CORS_PROXIES = [
@@ -35,9 +39,14 @@ export class BrowserDataFetcher {
             enabled: true
         },
         {
+            name: 'Corsproxy.io',
+            url: 'https://corsproxy.io/?',
+            enabled: true
+        },
+        {
             name: 'CORS Anywhere',
             url: 'https://cors-anywhere.herokuapp.com/',
-            enabled: false, // 기본 비활성화 (활성화 필요)
+            enabled: false // 기본 비활성화 (활성화 필요: https://cors-anywhere.herokuapp.com/corsdemo)
         }
     ];
 
@@ -146,6 +155,39 @@ export class BrowserDataFetcher {
     }
 
     /**
+     * 정적 데이터 로드 (여러 경로 시도)
+     * @returns {Promise<Object>} 정적 데이터
+     */
+    static async loadStaticFallback() {
+        const staticPaths = [
+            'src/data/latest_data.json',
+            './src/data/latest_data.json',
+            '/ImmigrationQueueManager/src/data/latest_data.json'
+        ];
+
+        for (const path of staticPaths) {
+            try {
+                console.log(`Trying static fallback: ${path}`);
+                const response = await fetch(path);
+
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('Static data loaded successfully from:', path);
+                    return {
+                        ...data,
+                        id: generateUUID(),
+                        source: 'static-fallback'
+                    };
+                }
+            } catch (error) {
+                console.warn(`Static fallback failed for ${path}:`, error.message);
+            }
+        }
+
+        throw new Error('정적 데이터를 로드할 수 없습니다');
+    }
+
+    /**
      * CORS 프록시를 통해 공항 데이터 가져오기
      * @param {string} date - YYYYMMDD 형식 날짜 (옵션)
      * @returns {Promise<Object>} 파싱된 데이터
@@ -158,54 +200,60 @@ export class BrowserDataFetcher {
             targetUrl += `?pday=${date}`;
         }
 
-        // 활성화된 프록시 찾기
-        const enabledProxy = this.CORS_PROXIES.find(p => p.enabled);
+        // 활성화된 프록시 목록
+        const enabledProxies = this.CORS_PROXIES.filter(p => p.enabled);
 
-        if (!enabledProxy) {
-            throw new Error('사용 가능한 CORS 프록시가 없습니다. CORS_PROXIES 설정을 확인하세요.');
+        if (enabledProxies.length === 0) {
+            console.warn('사용 가능한 CORS 프록시가 없습니다. 정적 데이터로 fallback합니다.');
+            return await this.loadStaticFallback();
         }
 
-        const proxyUrl = enabledProxy.url + encodeURIComponent(targetUrl);
+        let lastError = null;
 
-        console.log(`Fetching via ${enabledProxy.name}: ${proxyUrl}`);
+        // 각 프록시를 순차적으로 시도
+        for (const proxy of enabledProxies) {
+            const proxyUrl = proxy.url + encodeURIComponent(targetUrl);
+            console.log(`Fetching via ${proxy.name}: ${proxyUrl}`);
+
+            try {
+                const response = await fetch(proxyUrl, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                const html = await response.text();
+                
+                // HTML이 너무 짧으면 실패로 간주
+                if (html.length < 1000) {
+                    throw new Error('Response too short, likely blocked or error page');
+                }
+
+                const result = this.parseAirportHTML(html, date);
+                console.log(`Successfully fetched data via ${proxy.name}`);
+                return result;
+
+            } catch (error) {
+                console.warn(`${proxy.name} 프록시 실패:`, error.message);
+                lastError = error;
+                // 다음 프록시 시도
+                continue;
+            }
+        }
+
+        // 모든 프록시 실패 - 정적 데이터로 fallback
+        console.warn('모든 CORS 프록시 실패. 정적 데이터로 fallback합니다.');
+        console.warn('마지막 에러:', lastError?.message);
 
         try {
-            const response = await fetch(proxyUrl, {
-                method: 'GET',
-                headers: {
-                    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
-                }
-            });
-
-            if (!response.ok) {
-                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-            }
-
-            const html = await response.text();
-            return this.parseAirportHTML(html, date);
-
-        } catch (error) {
-            console.error(`${enabledProxy.name} 프록시 실패:`, error);
-
-            // Fallback: 정적 데이터 시도
-            try {
-                console.log('Fallback to static data...');
-                const staticResponse = await fetch('src/data/latest_data.json');
-
-                if (!staticResponse.ok) {
-                    throw new Error('Static data not available');
-                }
-
-                const staticData = await staticResponse.json();
-                return {
-                    ...staticData,
-                    id: generateUUID(),
-                    source: 'static-fallback'
-                };
-            } catch (fallbackError) {
-                console.error('Static fallback also failed:', fallbackError);
-                throw new Error(`데이터 가져오기 실패: ${error.message}`);
-            }
+            return await this.loadStaticFallback();
+        } catch (fallbackError) {
+            throw new Error(`데이터 가져오기 실패: ${lastError?.message || 'Unknown error'}. 정적 데이터도 로드할 수 없습니다.`);
         }
     }
 
