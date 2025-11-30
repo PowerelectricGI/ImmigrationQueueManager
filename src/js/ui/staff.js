@@ -31,6 +31,14 @@ export class StaffUI {
         const id = e.target.dataset.id;
         this.handleDeleteStaff(id);
       }
+      if (e.target.id === 'btn-save-staff') {
+        this.eventBus.emit('staff:save');
+      }
+      if (e.target.id === 'btn-reset-staff') {
+        if (confirm('정말 모든 직원 및 배정 데이터를 초기화하시겠습니까?')) {
+          this.eventBus.emit('staff:reset');
+        }
+      }
     });
   }
 
@@ -95,6 +103,11 @@ export class StaffUI {
         <div class="add-staff-form" style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
           <input type="text" id="new-staff-name" placeholder="직원 이름 입력" style="flex: 1; padding: 0.8rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--color-bg-input); color: var(--color-text-primary);">
           <button id="btn-add-staff" style="padding: 0 1.5rem; background: var(--color-primary); color: white; border: none; border-radius: var(--radius-sm); font-weight: bold;">추가</button>
+        </div>
+
+        <div class="staff-actions" style="display: flex; justify-content: flex-end; gap: 0.5rem; margin-bottom: 1rem;">
+            <button id="btn-save-staff" style="padding: 0.5rem 1rem; background: var(--color-success); color: white; border: none; border-radius: var(--radius-sm); cursor: pointer;">저장</button>
+            <button id="btn-reset-staff" style="padding: 0.5rem 1rem; background: var(--color-danger); color: white; border: none; border-radius: var(--radius-sm); cursor: pointer;">초기화</button>
         </div>
 
         <div class="staff-list" style="background: var(--color-bg-card); border-radius: var(--radius-md); overflow: hidden;">

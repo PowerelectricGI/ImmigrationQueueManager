@@ -153,6 +153,24 @@ class App {
       }
     });
 
+    // Staff Save (New)
+    this.eventBus.on('staff:save', () => {
+      if (Storage.save(STORAGE_KEYS.STAFF, this.state.staffList)) {
+        alert('직원 및 배정 데이터가 저장되었습니다.');
+      } else {
+        alert('저장에 실패했습니다.');
+      }
+    });
+
+    // Staff Reset (New)
+    this.eventBus.on('staff:reset', () => {
+      this.state.staffList = [];
+      Storage.remove(STORAGE_KEYS.STAFF);
+      this.staffUI.setStaffList([]);
+      this.dashboard.updateStaffList([]);
+      alert('모든 직원 및 배정 데이터가 초기화되었습니다.');
+    });
+
     // 파일 업로드
     const fileInput = document.getElementById('csv-upload');
     const uploadBtn = document.getElementById('btn-upload-file');
