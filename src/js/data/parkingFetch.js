@@ -100,9 +100,9 @@ export class ParkingDataFetcher {
             // CSS 선택자로 변환 (XPath 대응)
             // #menu964_obj1181 > div > div:nth-child(4) > ul > li:nth-child(N) > div > div:nth-child(2) > div:first-child
             const baseSelector = '#menu964_obj1181';
-            
+
             // 지상 1층
-            const floor1Text = this.getTextBySelector(doc, 
+            const floor1Text = this.getTextBySelector(doc,
                 `${baseSelector} > div > div:nth-child(4) > ul > li:nth-child(1) > div > div:nth-child(2) > div:first-child`
             ) || this.getTextBySelector(doc,
                 `${baseSelector} div > div:nth-of-type(4) ul li:nth-child(1) div div:nth-of-type(2) div:first-child`
@@ -133,7 +133,7 @@ export class ParkingDataFetcher {
                     listItems.forEach((li, index) => {
                         // div > div:nth-child(2) > div:first-child 에서 숫자 찾기
                         const numDiv = li.querySelector('div > div:nth-child(2) > div:first-child') ||
-                                       li.querySelector('div div:nth-of-type(2) div:first-child');
+                            li.querySelector('div div:nth-of-type(2) div:first-child');
                         if (numDiv) {
                             const num = this.extractNumber(numDiv.textContent);
                             if (index === 0) result.floor1.available = num;
@@ -231,16 +231,16 @@ export class ParkingDataFetcher {
                 const container = doc.querySelector('#menu965_obj1182');
                 if (container) {
                     const divs = container.querySelectorAll(':scope > div > div');
-                    
+
                     divs.forEach((div, divIndex) => {
                         const listItems = div.querySelectorAll('ul li');
                         if (listItems.length >= 3) {
                             listItems.forEach((li, liIndex) => {
                                 const numDiv = li.querySelector('div > div:nth-child(2) > div:first-child') ||
-                                               li.querySelector('div div:nth-of-type(2) div:first-child');
+                                    li.querySelector('div div:nth-of-type(2) div:first-child');
                                 if (numDiv) {
                                     const num = this.extractNumber(numDiv.textContent);
-                                    
+
                                     // div[4] = index 3 (동편), div[5] = index 4 (서편)
                                     if (divIndex === 3) { // 동편
                                         if (liIndex === 0) result.east.p1.available = num;
@@ -313,54 +313,26 @@ export class ParkingDataFetcher {
      * @returns {Promise<Object>} 주차장 데이터
      */
     static async fetchParkingData() {
-        const result = {
-            id: generateUUID(),
-            lastUpdated: new Date().toISOString(),
-            shortTerm: null,
-            longTerm: null,
-            errors: []
-        };
-
-        // 단기주차장 데이터 가져오기
         try {
-            const shortTermHtml = await this.fetchWithProxy(this.PARKING_URLS.shortTerm);
-            result.shortTerm = this.parseShortTermHTML(shortTermHtml);
-            console.log('단기주차장 데이터:', result.shortTerm);
+            // GitHub Pages 환경을 고려하여 상대 경로 사용
+            // index.html이 root에 있고 data는 src/data에 있음
+            const response = await fetch('src/data/parking_data.json');
+
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
+            }
+
+            const data = await response.json();
+            console.log('Loaded parking data from static file:', data);
+            return data;
+
         } catch (error) {
-            console.error('단기주차장 데이터 가져오기 실패:', error);
-            result.errors.push(`단기주차장: ${error.message}`);
-            // 기본값 설정
-            result.shortTerm = {
-                floor1: { available: '-', name: '지상 1층' },
-                basement1: { available: '-', name: '지하 1층' },
-                basement2: { available: '-', name: '지하 2층' }
+            console.error('주차장 데이터 로드 실패:', error);
+            return {
+                ...this.getSampleData(),
+                errors: [`데이터 로드 실패: ${error.message}`]
             };
         }
-
-        // 장기주차장 데이터 가져오기
-        try {
-            const longTermHtml = await this.fetchWithProxy(this.PARKING_URLS.longTerm);
-            result.longTerm = this.parseLongTermHTML(longTermHtml);
-            console.log('장기주차장 데이터:', result.longTerm);
-        } catch (error) {
-            console.error('장기주차장 데이터 가져오기 실패:', error);
-            result.errors.push(`장기주차장: ${error.message}`);
-            // 기본값 설정
-            result.longTerm = {
-                east: {
-                    p1: { available: '-', name: '장기주차장 P1' },
-                    tower: { available: '-', name: '주차타워 동편' },
-                    p3: { available: '-', name: '장기주차장 P3' }
-                },
-                west: {
-                    p2: { available: '-', name: '장기주차장 P2' },
-                    tower: { available: '-', name: '주차타워 서편' },
-                    p4: { available: '-', name: '장기주차장 P4' }
-                }
-            };
-        }
-
-        return result;
     }
 
     /**
