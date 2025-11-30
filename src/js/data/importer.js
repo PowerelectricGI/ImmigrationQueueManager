@@ -4,6 +4,7 @@
  */
 
 import { generateUUID } from '../utils/helpers.js';
+import { BrowserDataFetcher } from './browserFetch.js';
 
 export class AirportDataImporter {
     /**
@@ -164,6 +165,18 @@ export class AirportDataImporter {
      * @returns {Promise<Object>} 파싱된 데이터
      */
     static async fetchFromApi(date) {
+        // GitHub Pages 환경에서는 BrowserDataFetcher 사용
+        if (!window.location.hostname.includes('localhost') && !window.location.hostname.includes('127.0.0.1')) {
+            console.log('GitHub Pages 환경 감지, BrowserDataFetcher 사용');
+            try {
+                return await BrowserDataFetcher.fetchFromBrowser(date);
+            } catch (error) {
+                console.error('Browser fetch failed:', error);
+                throw new Error(`브라우저 데이터 가져오기 실패: ${error.message}`);
+            }
+        }
+
+        // 로컬 서버 환경에서는 기존 API 방식 사용
         try {
             let url = '/api/airport-data';
             if (date) {
