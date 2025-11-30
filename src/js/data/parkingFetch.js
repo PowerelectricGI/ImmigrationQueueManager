@@ -313,26 +313,54 @@ export class ParkingDataFetcher {
      * @returns {Promise<Object>} 주차장 데이터
      */
     static async fetchParkingData() {
+        const result = {
+            id: generateUUID(),
+            lastUpdated: new Date().toISOString(),
+            shortTerm: null,
+            longTerm: null,
+            errors: []
+        };
+
+        // 단기주차장 데이터 가져오기
         try {
-            // GitHub Pages 환경을 고려하여 상대 경로 사용
-            // index.html이 root에 있고 data는 src/data에 있음
-            const response = await fetch('src/data/parking_data.json');
-
-            if (!response.ok) {
-                throw new Error(`HTTP ${response.status}`);
-            }
-
-            const data = await response.json();
-            console.log('Loaded parking data from static file:', data);
-            return data;
-
+            const shortTermHtml = await this.fetchWithProxy(this.PARKING_URLS.shortTerm);
+            result.shortTerm = this.parseShortTermHTML(shortTermHtml);
+            console.log('단기주차장 데이터:', result.shortTerm);
         } catch (error) {
-            console.error('주차장 데이터 로드 실패:', error);
-            return {
-                ...this.getSampleData(),
-                errors: [`데이터 로드 실패: ${error.message}`]
+            console.error('단기주차장 데이터 가져오기 실패:', error);
+            result.errors.push(`단기주차장: ${error.message}`);
+            // 기본값 설정
+            result.shortTerm = {
+                floor1: { available: 0, name: '지상 1층' },
+                basement1: { available: 0, name: '지하 1층' },
+                basement2: { available: 0, name: '지하 2층' }
             };
         }
+
+        // 장기주차장 데이터 가져오기
+        try {
+            const longTermHtml = await this.fetchWithProxy(this.PARKING_URLS.longTerm);
+            result.longTerm = this.parseLongTermHTML(longTermHtml);
+            console.log('장기주차장 데이터:', result.longTerm);
+        } catch (error) {
+            console.error('장기주차장 데이터 가져오기 실패:', error);
+            result.errors.push(`장기주차장: ${error.message}`);
+            // 기본값 설정
+            result.longTerm = {
+                east: {
+                    p1: { available: 0, name: '장기주차장 P1' },
+                    tower: { available: 0, name: '주차타워 동편' },
+                    p3: { available: 0, name: '장기주차장 P3' }
+                },
+                west: {
+                    p2: { available: 0, name: '장기주차장 P2' },
+                    tower: { available: 0, name: '주차타워 서편' },
+                    p4: { available: 0, name: '장기주차장 P4' }
+                }
+            };
+        }
+
+        return result;
     }
 
     /**
