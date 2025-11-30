@@ -10,6 +10,8 @@ import { SampleForecast } from './data/sampleData.js';
 import { calculateAllRequirements } from './core/calculator.js';
 import { Dashboard } from './ui/dashboard.js';
 import { StaffUI } from './ui/staff.js';
+import { ParkingUI } from './ui/parking.js';
+import { ParkingDataFetcher } from './data/parkingFetch.js';
 
 // --- EventBus Implementation ---
 class EventBus {
@@ -40,12 +42,14 @@ class App {
     this.eventBus = new EventBus();
     this.dashboard = new Dashboard(this.eventBus);
     this.staffUI = new StaffUI(this.eventBus);
+    this.parkingUI = new ParkingUI(this.eventBus);
 
     this.state = {
       settings: DefaultSettings,
       forecast: null,
       requirement: null,
-      staffList: []
+      staffList: [],
+      parkingData: null
     };
 
     window.iqmApp = this;
@@ -251,6 +255,44 @@ class App {
         this.recalculate();
       }
     });
+
+    // 주차장 데이터 가져오기 버튼
+    const parkingFetchBtn = document.getElementById('btn-fetch-parking');
+    if (parkingFetchBtn) {
+      parkingFetchBtn.addEventListener('click', async () => {
+        try {
+          parkingFetchBtn.disabled = true;
+          parkingFetchBtn.innerHTML = '<span class="btn-icon">⏳</span><span>Loading...</span>';
+
+          const parkingData = await ParkingDataFetcher.fetchParkingData();
+          this.state.parkingData = parkingData;
+          this.parkingUI.setData(parkingData);
+
+          if (parkingData.errors && parkingData.errors.length > 0) {
+            alert(`주차장 데이터를 가져왔습니다.\n일부 오류: ${parkingData.errors.join(', ')}`);
+          } else {
+            alert('주차장 현황을 성공적으로 가져왔습니다.');
+          }
+        } catch (error) {
+          console.error('주차장 데이터 가져오기 실패:', error);
+          alert(`주차장 데이터 가져오기 실패: ${error.message}`);
+        } finally {
+          parkingFetchBtn.disabled = false;
+          parkingFetchBtn.innerHTML = '<span class="btn-icon">🔄</span><span>주차장 현황 가져오기</span>';
+        }
+      });
+    }
+
+    // 주차장 샘플 데이터 버튼
+    const parkingSampleBtn = document.getElementById('btn-parking-sample');
+    if (parkingSampleBtn) {
+      parkingSampleBtn.addEventListener('click', () => {
+        const sampleData = ParkingDataFetcher.getSampleData();
+        this.state.parkingData = sampleData;
+        this.parkingUI.setData(sampleData);
+        alert('주차장 샘플 데이터가 로드되었습니다.');
+      });
+    }
   }
 
   /**

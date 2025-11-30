@@ -818,3 +818,242 @@ input[type="range"]::-moz-range-thumb {
 ::-webkit-scrollbar-thumb:hover {
   background: var(--color-text-muted);
 }
+
+/* ============================================
+   Parking Section Styles
+   ============================================ */
+.parking-view-section {
+  padding: var(--spacing-md);
+}
+
+.parking-view-header {
+  text-align: center;
+  margin-bottom: var(--spacing-lg);
+}
+
+.parking-view-header h2 {
+  font-size: 1.5rem;
+  margin-bottom: var(--spacing-xs);
+}
+
+.parking-view-subtitle {
+  color: var(--color-text-secondary);
+  font-size: 0.9rem;
+}
+
+.parking-actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-lg);
+}
+
+.parking-content {
+  margin-top: var(--spacing-md);
+}
+
+.parking-header {
+  margin-bottom: var(--spacing-md);
+}
+
+.parking-update-time {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+  padding: var(--spacing-sm);
+  background: var(--color-bg-card);
+  border-radius: var(--radius-sm);
+}
+
+.sample-badge {
+  background: var(--color-alert-yellow);
+  color: #000;
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  font-size: 0.75rem;
+  margin-left: auto;
+}
+
+.parking-errors {
+  margin-bottom: var(--spacing-md);
+}
+
+.parking-errors .error-item {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid var(--color-alert-red);
+  color: var(--color-alert-red);
+  padding: var(--spacing-sm);
+  border-radius: var(--radius-sm);
+  margin-bottom: var(--spacing-xs);
+  font-size: 0.85rem;
+}
+
+.parking-section {
+  margin-bottom: var(--spacing-xl);
+}
+
+.parking-section-header {
+  display: flex;
+  align-items: baseline;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
+  padding-bottom: var(--spacing-sm);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.parking-section-header h3 {
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+.parking-section-subtitle {
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+}
+
+.parking-subsection {
+  margin-bottom: var(--spacing-lg);
+}
+
+.parking-subsection-title {
+  font-size: 0.95rem;
+  margin-bottom: var(--spacing-sm);
+  color: var(--color-text-secondary);
+}
+
+.parking-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: var(--spacing-sm);
+}
+
+.parking-card {
+  background: var(--color-bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-md);
+  transition: all 0.2s ease;
+}
+
+.parking-card:hover {
+  border-color: var(--color-accent);
+  transform: translateY(-2px);
+}
+
+.parking-card.status-normal {
+  border-left: 3px solid var(--color-success);
+}
+
+.parking-card.status-warning {
+  border-left: 3px solid var(--color-alert-yellow);
+}
+
+.parking-card.status-critical {
+  border-left: 3px solid var(--color-alert-red);
+}
+
+.parking-card.status-unknown {
+  border-left: 3px solid var(--color-text-muted);
+}
+
+.parking-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: var(--spacing-sm);
+}
+
+.parking-name {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  line-height: 1.2;
+}
+
+.parking-status {
+  font-size: 0.7rem;
+  white-space: nowrap;
+}
+
+.parking-card-body {
+  text-align: center;
+}
+
+.parking-available {
+  margin-bottom: var(--spacing-xs);
+}
+
+.available-number {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--color-accent);
+  display: block;
+  line-height: 1;
+}
+
+.available-label {
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+}
+
+.parking-total {
+  margin-bottom: var(--spacing-sm);
+}
+
+.total-label {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+}
+
+.parking-progress {
+  margin-top: var(--spacing-sm);
+}
+
+.progress-bar {
+  height: 4px;
+  background: var(--color-bg-primary);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: var(--radius-full);
+  transition: width 0.3s ease;
+}
+
+.progress-fill.status-normal {
+  background: var(--color-success);
+}
+
+.progress-fill.status-warning {
+  background: var(--color-alert-yellow);
+}
+
+.progress-fill.status-critical {
+  background: var(--color-alert-red);
+}
+
+.parking-empty {
+  text-align: center;
+  padding: var(--spacing-xl) var(--spacing-md);
+  color: var(--color-text-secondary);
+}
+
+.parking-empty .empty-icon {
+  font-size: 3rem;
+  margin-bottom: var(--spacing-md);
+  opacity: 0.5;
+}
+
+.parking-empty .empty-text {
+  font-size: 1.1rem;
+  margin-bottom: var(--spacing-xs);
+}
+
+.parking-empty .empty-hint {
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+}

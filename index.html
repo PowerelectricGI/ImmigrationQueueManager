@@ -206,6 +206,37 @@
       <div id="view-staff" class="view-container hidden">
         <!-- Staff content injected by JS -->
       </div>
+
+      <!-- Parking View -->
+      <div id="view-parking" class="view-container hidden">
+        <section class="parking-view-section">
+          <div class="parking-view-header">
+            <h2>🅿️ 주차장 현황</h2>
+            <p class="parking-view-subtitle">인천공항 제1여객터미널</p>
+          </div>
+          
+          <div class="parking-actions">
+            <button class="data-btn parking-fetch-btn" id="btn-fetch-parking"
+              style="border-color: var(--color-accent); color: var(--color-accent);">
+              <span class="btn-icon">🔄</span>
+              <span>주차장 현황 가져오기</span>
+            </button>
+            <button class="data-btn" id="btn-parking-sample">
+              <span class="btn-icon">📋</span>
+              <span>샘플 데이터</span>
+            </button>
+          </div>
+
+          <div id="parking-content" class="parking-content">
+            <!-- Parking data rendered by JS -->
+            <div class="parking-empty">
+              <div class="empty-icon">🅿️</div>
+              <div class="empty-text">주차장 데이터가 없습니다</div>
+              <div class="empty-hint">위의 "주차장 현황 가져오기" 버튼을 클릭하세요</div>
+            </div>
+          </div>
+        </section>
+      </div>
     </main>
 
     <!-- Bottom Navigation (Mobile) -->
@@ -218,13 +249,13 @@
         <span class="nav-icon">🛫</span>
         <span class="nav-label">출국</span>
       </div>
+      <div class="nav-item" data-view="parking">
+        <span class="nav-icon">🅿️</span>
+        <span class="nav-label">주차장</span>
+      </div>
       <div class="nav-item" data-view="staff">
         <span class="nav-icon">👥</span>
-        <span class="nav-label">직원 관리</span>
-      </div>
-      <div class="nav-item" data-view="settings">
-        <span class="nav-icon">⚙️</span>
-        <span class="nav-label">설정</span>
+        <span class="nav-label">직원</span>
       </div>
       <div class="nav-item" data-view="data">
         <span class="nav-icon">📊</span>
