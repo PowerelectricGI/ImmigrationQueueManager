@@ -44,15 +44,15 @@ export const Storage = {
                     const currentIds = data.map(s => s.id);
 
                     if (currentIds.length > 0) {
+                        // Use array syntax for 'in' filter (safer)
                         const { error: deleteError } = await supabase
                             .from('staff')
                             .delete()
-                            .not('id', 'in', `(${currentIds.join(',')})`);
+                            .not('id', 'in', currentIds);
 
                         if (deleteError) throw deleteError;
                     } else {
                         // 리스트가 비어있으면 전체 삭제
-                        // Supabase delete requires a filter. We use neq '0' assuming no ID is '0'.
                         const { error: clearError } = await supabase
                             .from('staff')
                             .delete()
@@ -76,6 +76,7 @@ export const Storage = {
             return true;
         } catch (error) {
             console.error('Supabase save failed:', error);
+            alert(`클라우드 저장 실패: ${error.message || JSON.stringify(error)}`);
             return false;
         }
     },
