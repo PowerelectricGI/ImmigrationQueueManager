@@ -23,7 +23,7 @@ export const Storage = {
 
         // 2. Supabase에 저장
         try {
-            if (key === 'staff') {
+            if (key === STORAGE_KEYS.STAFF) {
                 if (Array.isArray(data)) {
                     // 1. Upsert (Insert or Update)
                     const updates = data.map(s => ({
@@ -61,7 +61,7 @@ export const Storage = {
                         if (clearError) throw clearError;
                     }
                 }
-            } else if (key === 'settings') {
+            } else if (key === STORAGE_KEYS.SETTINGS) {
                 const { error } = await supabase
                     .from('settings')
                     .upsert({
@@ -101,11 +101,11 @@ export const Storage = {
      */
     async fetchLatest(key) {
         try {
-            if (key === 'staff') {
+            if (key === STORAGE_KEYS.STAFF) {
                 const { data, error } = await supabase.from('staff').select('*');
                 if (error) throw error;
                 return data;
-            } else if (key === 'settings') {
+            } else if (key === STORAGE_KEYS.SETTINGS) {
                 const { data, error } = await supabase
                     .from('settings')
                     .select('config')
