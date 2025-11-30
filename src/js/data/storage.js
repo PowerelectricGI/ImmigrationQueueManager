@@ -4,7 +4,6 @@
  */
 
 import { STORAGE_KEYS } from '../config.js';
-
 import { supabase } from './supabaseClient.js';
 
 export const Storage = {
@@ -42,11 +41,8 @@ export const Storage = {
                     if (upsertError) throw upsertError;
 
                     // 2. Delete (Sync: Remove items not in the current list)
-                    // 현재 리스트에 있는 ID 목록
                     const currentIds = data.map(s => s.id);
 
-                    // DB에 있지만 현재 리스트에 없는 항목 삭제
-                    // (주의: 이 방식은 동시성 문제가 있을 수 있으나, 간단한 앱에서는 허용)
                     if (currentIds.length > 0) {
                         const { error: deleteError } = await supabase
                             .from('staff')
@@ -56,50 +52,119 @@ export const Storage = {
                         if (deleteError) throw deleteError;
                     } else {
                         // 리스트가 비어있으면 전체 삭제
-                        const { error: deleteAllError } = await supabase
+                        // Supabase delete requires a filter. We use neq '0' assuming no ID is '0'.
+                        const { error: clearError } = await supabase
                             .from('staff')
                             .delete()
-                            .neq('id', 'placeholder'); // Delete all (using a dummy condition if needed, or just no filter)
+                            .neq('id', '0');
 
+                        if (clearError) throw clearError;
+                    }
+                }
+            } else if (key === 'settings') {
+                const { error } = await supabase
+                    .from('settings')
+                    .upsert({
+                        id: 'global_settings',
+                        config: data,
+                        updated_at: new Date().toISOString()
+                    });
+
+                if (error) throw error;
+            }
+
+            return true;
+        } catch (error) {
+            console.error('Supabase save failed:', error);
+            return false;
+        }
+    },
+
+    /**
      * 데이터 불러오기
-                            * @param { string } key
-                                */
-                        load(key) {
-                            // 동기적으로 LocalStorage 반환 (초기 렌더링용)
-                            try {
-                                const serialized = localStorage.getItem(key);
-                                return serialized ? JSON.parse(serialized) : null;
-                            } catch (error) {
-                                return null;
-                            }
-                        },
+     * @param {string} key 
+     */
+    load(key) {
+        // 동기적으로 LocalStorage 반환 (초기 렌더링용)
+        try {
+            const serialized = localStorage.getItem(key);
+            return serialized ? JSON.parse(serialized) : null;
+        } catch (error) {
+            return null;
+        }
+    },
 
     /**
      * Supabase에서 최신 데이터 가져오기 (비동기)
      * @param {string} key 
      */
     async fetchLatest(key) {
-                            try {
-                                if (key === 'staff') {
-                                    const { data, error } = await supabase.from('staff').select('*');
-                                    if (error) throw error;
-                                    return data;
-                                } else if (key === 'settings') {
-                                    const { data, error } = await supabase
-                                        .from('settings')
-                                        .select('config')
-                                        .eq('id', 'global_settings')
-                                        .single();
-                                    if (error) throw error;
-                                    return data?.config || null;
-                                }
-                            } catch (error) {
-                                console.error(`Failed to fetch latest ${key}:`, error);
-                                return null;
-                            }
-                        },
+        try {
+            if (key === 'staff') {
+                const { data, error } = await supabase.from('staff').select('*');
+                if (error) throw error;
+                return data;
+            } else if (key === 'settings') {
+                const { data, error } = await supabase
+                    .from('settings')
+                    .select('config')
+                    .eq('id', 'global_settings')
+                    .single();
+                if (error) throw error;
+                return data?.config || null;
+            }
+        } catch (error) {
+            console.error(`Failed to fetch latest ${key}:`, error);
+            return null;
+        }
+    },
 
-                        has(key) {
-                            return localStorage.getItem(key) !== null;
-                        }
-                    };
+    /**
+     * 실시간 구독
+     * @param {Function} onStaffChange 
+     * @param {Function} onSettingsChange 
+     * @param {Function} onStatusChange 
+     */
+    subscribe(onStaffChange, onSettingsChange, onStatusChange) {
+        const channel = supabase.channel('schema-db-changes')
+            .on(
+                'postgres_changes',
+                { event: '*', schema: 'public', table: 'staff' },
+                (payload) => {
+                    console.log('Staff change received:', payload);
+                    this.fetchLatest('staff').then(data => {
+                        if (data) onStaffChange(data);
+                    });
+                }
+            )
+            .on(
+                'postgres_changes',
+                { event: '*', schema: 'public', table: 'settings' },
+                (payload) => {
+                    console.log('Settings change received:', payload);
+                    if (payload.new && payload.new.config) {
+                        onSettingsChange(payload.new.config);
+                    }
+                }
+            )
+            .subscribe((status) => {
+                console.log('Supabase Subscription Status:', status);
+                if (onStatusChange) onStatusChange(status);
+            });
+
+        // Connection Timeout Check
+        setTimeout(() => {
+            console.log('Checking subscription connection...');
+        }, 5000);
+
+        return channel;
+    },
+
+    remove(key) {
+        localStorage.removeItem(key);
+    },
+
+    has(key) {
+        return localStorage.getItem(key) !== null;
+    }
+};
