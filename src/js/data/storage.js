@@ -35,40 +35,10 @@ export const Storage = {
                     }));
 
                     const { error: upsertError } = await supabase
-                        .from('staff')
-                        .upsert(updates);
-
-                    if (upsertError) throw upsertError;
-
-                    // 2. Delete (Sync: Remove items not in the current list)
-                    const currentIds = data.map(s => s.id);
-
-                    if (currentIds.length > 0) {
-                        // Use array syntax for 'in' filter (safer)
-                        const { error: deleteError } = await supabase
-                            .from('staff')
-                            .delete()
-                            .not('id', 'in', currentIds);
-
-                        if (deleteError) throw deleteError;
-                    } else {
-                        // 리스트가 비어있으면 전체 삭제
-                        const { error: clearError } = await supabase
-                            .from('staff')
-                            .delete()
-                            .neq('id', '0');
-
-                        if (clearError) throw clearError;
-                    }
-                }
-            } else if (key === STORAGE_KEYS.SETTINGS) {
-                const { error } = await supabase
-                    .from('settings')
-                    .upsert({
-                        id: 'global_settings',
+                    id: 'global_settings',
                         config: data,
-                        updated_at: new Date().toISOString()
-                    });
+                            updated_at: new Date().toISOString()
+                });
 
                 if (error) throw error;
             }
