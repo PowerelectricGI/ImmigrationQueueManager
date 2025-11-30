@@ -165,62 +165,28 @@ export class AirportDataImporter {
      * @returns {Promise<Object>} 파싱된 데이터
      */
     static async fetchFromApi(date) {
-        // GitHub Pages 환경에서는 BrowserDataFetcher 사용
-        if (!window.location.hostname.includes('localhost') && !window.location.hostname.includes('127.0.0.1')) {
-            console.log('GitHub Pages 환경 감지, BrowserDataFetcher 사용');
-            try {
-                return await BrowserDataFetcher.fetchFromBrowser(date);
-            } catch (error) {
-                console.error('Browser fetch failed:', error);
-                throw new Error(`브라우저 데이터 가져오기 실패: ${error.message}`);
-            }
-        }
-
-        // 로컬 서버 환경에서는 기존 API 방식 사용
+        // 서버리스 구조이므로 항상 BrowserDataFetcher (CORS Proxy) 사용
+        console.log('Fetching live data via BrowserDataFetcher...');
         try {
-            let url = '/api/airport-data';
-            if (date) {
-                url += `?date=${date}`;
-            }
-
-            const response = await fetch(url);
-            if (!response.ok) {
-                throw new Error(`Server responded with ${response.status}`);
-            }
-            const data = await response.json();
-
-            if (data.error) {
-                throw new Error(data.error);
-            }
-
-            return {
-                ...data,
-                id: generateUUID(),
-                source: 'api'
-            };
+            return await BrowserDataFetcher.fetchFromBrowser(date);
         } catch (error) {
-            console.warn('API Fetch failed, trying static data...', error);
+            console.warn('Browser fetch failed, trying static fallback...', error);
 
-            // Fallback to static data (GitHub Pages support)
+            // Fallback to static data
             try {
-                // Adjust path based on where index.html is served. 
-                // index.html is at root, data is in src/data/
                 const staticResponse = await fetch('src/data/latest_data.json');
                 if (!staticResponse.ok) {
                     throw new Error('Static data not found');
                 }
                 const staticData = await staticResponse.json();
 
-                // If user requested a specific date, we should warn them that this is static data
-                // But for now, just return what we have
                 return {
                     ...staticData,
                     id: generateUUID(),
-                    source: 'static'
+                    source: 'static-fallback'
                 };
             } catch (staticError) {
-                console.error('Static Data Fetch Error:', staticError);
-                throw error; // Throw original error if both fail
+                throw new Error(`데이터 가져오기 실패: ${error.message}. 정적 데이터도 로드할 수 없습니다.`);
             }
         }
     }
