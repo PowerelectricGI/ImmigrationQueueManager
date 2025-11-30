@@ -2,6 +2,7 @@
  * src/js/app.js
  * 메인 애플리케이션 진입점
  */
+console.log('App.js loaded');
 
 import { DefaultSettings, STORAGE_KEYS } from './config.js';
 import { Storage } from './data/storage.js';
