@@ -70,7 +70,11 @@ class App {
         if (remoteSettings) {
           console.log('Remote settings loaded');
           this.state.settings = { ...DefaultSettings, ...remoteSettings };
-          this.eventBus.emit('settings:changed', this.state.settings);
+          // Do NOT emit 'settings:changed' here to avoid auto-saving back to server
+          // Just update local state and UI
+          if (this.state.forecast) {
+            this.recalculate();
+          }
         }
       });
 
@@ -108,8 +112,8 @@ class App {
           this.state.staffList = remoteStaff;
           this.staffUI.setStaffList(remoteStaff);
           this.dashboard.updateStaffList(remoteStaff);
-          // LocalStorage 동기화
-          Storage.save(STORAGE_KEYS.STAFF, remoteStaff);
+          // LocalStorage 동기화 (Cloud Save 호출 없이 로컬만 업데이트)
+          localStorage.setItem(STORAGE_KEYS.STAFF, JSON.stringify(remoteStaff));
         }
       });
 
