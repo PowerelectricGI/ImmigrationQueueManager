@@ -207,20 +207,210 @@
     </div>
     <div class="nav-item" data-view="data">
       <span class="nav-icon">📊</span>
-      <span class="nav-label">데이터</span>
     </div>
-  </nav>
-  </div>
+    <div class="header-right">
+      <button id="settings-btn" class="icon-btn" aria-label="설정">⚙️</button>
+    </div>
+    </header>
 
-  // .then(registration => {
-  // console.log('SW registered:', registration.scope);
-  // })
-  // .catch(err => {
-  // console.log('SW registration failed:', err);
-  // });
-  // });
-  // }
-  </script>
-  </body>
+    <!-- Main Content -->
+    <main class="app-main" id="main-content">
+      <!-- Arrival View (Merged Dashboard) -->
+      <div id="view-arrival" class="view-container">
+        <div class="zone-detail-header">
+          <div class="peak-alert-header">
+            <span class="peak-alert-icon">⚠️</span>
+            <span class="peak-alert-title" id="peak-time">08:00 피크 예상</span>
+          </div>
+          <div class="peak-alert-details">
+            <div class="peak-alert-row">
+              입국: <span id="peak-arrival-pax">4,573</span>명 → <span class="highlight" id="peak-arrival-staff">8명</span>
+            </div>
+            <div class="peak-alert-row">
+              출국: <span id="peak-departure-pax">5,970</span>명 → <span class="highlight"
+                id="peak-departure-staff">10명</span>
+            </div>
+          </div>
+        </div>
+        </section>
+
+        <!-- Chart Section -->
+        <section class="chart-section">
+          <div class="section-header">
+            <h3>입국 승객 예측</h3>
+          </div>
+          <div class="chart-container">
+            <canvas id="main-chart"></canvas>
+          </div>
+
+          <div class="chart-legend">
+            <div class="chart-legend-item">
+              <span class="legend-color arrival"></span>
+              <span>승객 수</span>
+            </div>
+            <div class="chart-legend-item">
+              <span class="legend-color staff"></span>
+              <span>필요 심사관</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- Zone Detail & Booth Assignment -->
+        <div class="zone-detail-list" id="arrival-zone-list"></div>
+        <div id="arrival-booth-container" style="padding: 0 var(--spacing-md);"></div>
+        <div class="zone-total" id="arrival-total">
+          <span class="zone-total-text">합계: <span class="pax">4,573</span>명 / <span class="staff">9명</span>
+            필요</span>
+        </div>
+      </div>
+      <div class="peak-alert-header">
+        <span class="peak-alert-icon">⚠️</span>
+        <span class="peak-alert-title" id="peak-time-dep">08:00 피크 예상</span>
+      </div>
+      <div class="peak-alert-details">
+        <div class="peak-alert-row">
+          입국: <span id="peak-arrival-pax-dep">4,573</span>명 → <span class="highlight"
+            id="peak-arrival-staff-dep">8명</span>
+        </div>
+        <div class="peak-alert-row">
+          출국: <span id="peak-departure-pax-dep">5,970</span>명 → <span class="highlight"
+            id="peak-departure-staff-dep">10명</span>
+        </div>
+      </div>
+      </div>
+      </section>
+
+      <!-- Departure Chart Section -->
+      <section class="chart-section">
+        <div class="chart-container">
+          <canvas id="departure-chart"></canvas>
+        </div>
+        <div class="chart-legend">
+          <div class="chart-legend-item">
+            <span class="legend-color arrival"
+              style="background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);"></span>
+            <span>승객 수</span>
+          </div>
+          <div class="chart-legend-item">
+            <span class="legend-color staff"></span>
+            <span>필요 심사관</span>
+          </div>
+        </div>
+      </section>
+      <div class="zone-detail-list" id="departure-zone-list"></div>
+      <div class="zone-total" id="departure-total">
+        <span class="zone-total-text">합계: <span class="pax">5,970</span>명 / <span class="staff">12명</span>
+          필요</span>
+      </div>
+      </div>
+
+      <!-- Data Input View -->
+      <div id="view-data" class="view-container hidden">
+        <section class="data-input-section">
+          <div class="date-input-container" style="margin-bottom: var(--spacing-sm);">
+            <span class="btn-icon">🔄</span>
+            <span>실시간 데이터 가져오기</span>
+            </button>
+            <button class="data-btn" id="btn-sample-data">
+              <span class="btn-icon">📋</span>
+              <span>샘플 데이터 사용</span>
+            </button>
+
+            <div class="data-table-container">
+              <div class="data-table-header">수동 입력</div>
+              <div style="overflow-x: auto;">
+                <table class="data-table" id="manual-input-table">
+                  <thead>
+                    <tr>
+                      <th>시간</th>
+                      <th>입국 합계</th>
+                      <th>출국 합계</th>
+                    </tr>
+                  </thead>
+                  <tbody id="manual-input-body">
+                    <!-- Generated by JS -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <button class="data-save-btn" id="btn-save-data">데이터 저장</button>
+        </section>
+      </div>
+
+      <!-- Settings View -->
+      <div id="view-settings" class="view-container hidden">
+        <!-- Settings content injected by JS -->
+      </div>
+      <div id="view-staff" class="view-container hidden">
+        <!-- Staff content injected by JS -->
+      </div>
+
+      <!-- Parking View -->
+      <div id="view-parking" class="view-container hidden">
+        <section class="parking-view-section">
+          <div class="parking-view-header">
+            <h2>🅿️ 주차장 현황</h2>
+            <p class="parking-view-subtitle">인천공항 제1여객터미널</p>
+          </div>
+
+          <div class="parking-actions">
+            <button class="data-btn parking-fetch-btn" id="btn-fetch-parking"
+              style="border-color: var(--color-accent); color: var(--color-accent);">
+              <span class="btn-icon">🔄</span>
+              <span>주차장 현황 가져오기</span>
+            </button>
+            <button class="data-btn" id="btn-parking-sample">
+              <span class="btn-icon">📋</span>
+              <span>샘플 데이터</span>
+            </button>
+          </div>
+
+          <div id="parking-content" class="parking-content">
+            <!-- Parking data rendered by JS -->
+            <div class="parking-empty">
+              <div class="empty-icon">🅿️</div>
+              <div class="empty-text">주차장 데이터가 없습니다</div>
+              <div class="empty-hint">위의 "주차장 현황 가져오기" 버튼을 클릭하세요</div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <!-- Bottom Navigation (Mobile) -->
+    <nav class="app-footer">
+      <div class="nav-item active" data-view="arrival">
+        <span class="nav-icon">🛬</span>
+        <span class="nav-label">입국</span>
+      </div>
+      <div class="nav-item" data-view="departure">
+        <span class="nav-icon">🛫</span>
+        <span class="nav-label">출국</span>
+      </div>
+      <div class="nav-item" data-view="parking">
+        <span class="nav-icon">🅿️</span>
+        <span class="nav-label">주차장</span>
+      </div>
+      <div class="nav-item" data-view="staff">
+        <span class="nav-icon">👥</span>
+        <span class="nav-label">직원</span>
+      </div>
+      <div class="nav-item" data-view="settings">
+        <span class="nav-icon">⚙️</span>
+        <span class="nav-label">설정</span>
+      </div>
+      <div class="nav-item" data-view="data">
+        <span class="nav-icon">📊</span>
+        <span class="nav-label">데이터</span>
+      </div>
+    </nav>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="src/js/lib/supabase.js"></script>
+    <script type="module" src="src/js/app.js?v=20251201_0130"></script>
+
+    </body>
 
 </html>
