@@ -62,29 +62,39 @@ def fetch_parking_data():
         resp.raise_for_status()
         soup = BeautifulSoup(resp.text, 'html.parser')
         
-        # XPath mappings to CSS selectors
-        # Floor 1: //*[@id="menu964_obj1181"]/div/div[4]/ul/li[1]/div/div[2]/div[1]/strong
-        
-        def get_text(selector):
-            el = soup.select_one(selector)
-            return el.get_text(strip=True) if el else "0"
+        container = soup.select_one("#menu964_obj1181")
+        if not container:
+            raise ValueError("Short term container not found")
 
-        def extract_num(text):
-            return int(re.sub(r'[^0-9]', '', text)) if text else 0
-
-        # Note: nth-of-type is 1-based. 
-        # div[4] -> div:nth-of-type(4)
-        base_sel = "#menu964_obj1181 > div > div:nth-of-type(4) > ul"
-        
-        floor1_text = get_text(f"{base_sel} > li:nth-of-type(1) > div > div:nth-of-type(2) > div:nth-of-type(1) > strong")
-        b1_text = get_text(f"{base_sel} > li:nth-of-type(2) > div > div:nth-of-type(2) > div:nth-of-type(1) > strong")
-        b2_text = get_text(f"{base_sel} > li:nth-of-type(3) > div > div:nth-of-type(2) > div:nth-of-type(1) > strong")
-
-        result["shortTerm"] = {
-            "floor1": {"available": extract_num(floor1_text), "name": "지상 1층"},
-            "basement1": {"available": extract_num(b1_text), "name": "지하 1층"},
-            "basement2": {"available": extract_num(b2_text), "name": "지하 2층"}
+        # Initialize with defaults
+        st_data = {
+            "floor1": {"available": 0, "name": "지상 1층"},
+            "basement1": {"available": 0, "name": "지하 1층"},
+            "basement2": {"available": 0, "name": "지하 2층"}
         }
+
+        # Iterate all list items to find matches
+        items = container.select("ul > li")
+        for item in items:
+            label_el = item.select_one(".num-txt")
+            val_el = item.select_one(".num-noti strong")
+            
+            if not label_el or not val_el:
+                continue
+                
+            label = label_el.get_text(strip=True)
+            val_text = val_el.get_text(strip=True)
+            val = int(re.sub(r'[^0-9]', '', val_text)) if val_text else 0
+            
+            if "지상 1층" in label:
+                st_data["floor1"]["available"] = val
+            elif "지하 1층" in label:
+                st_data["basement1"]["available"] = val
+            elif "지하 2층" in label:
+                st_data["basement2"]["available"] = val
+
+        result["shortTerm"] = st_data
+
     except Exception as e:
         print(f"Error fetching short-term parking: {e}")
         result["errors"].append(f"Short-term: {str(e)}")
@@ -96,37 +106,75 @@ def fetch_parking_data():
         resp.raise_for_status()
         soup = BeautifulSoup(resp.text, 'html.parser')
 
-        def get_text(selector):
-            el = soup.select_one(selector)
-            return el.get_text(strip=True) if el else "0"
+        container = soup.select_one("#menu965_obj1182")
+        if not container:
+            raise ValueError("Long term container not found")
 
-        def extract_num(text):
-            return int(re.sub(r'[^0-9]', '', text)) if text else 0
-
-        # East: div[4]
-        east_base = "#menu965_obj1182 > div > div:nth-of-type(4) > ul"
-        east_p1 = get_text(f"{east_base} > li:nth-of-type(1) > div > div:nth-of-type(2) > div:nth-of-type(1) > strong")
-        east_tower = get_text(f"{east_base} > li:nth-of-type(2) > div > div:nth-of-type(2) > div:nth-of-type(1) > strong")
-        east_p3 = get_text(f"{east_base} > li:nth-of-type(3) > div > div:nth-of-type(2) > div:nth-of-type(1) > strong")
-
-        # West: div[5]
-        west_base = "#menu965_obj1182 > div > div:nth-of-type(5) > ul"
-        west_p2 = get_text(f"{west_base} > li:nth-of-type(1) > div > div:nth-of-type(2) > div:nth-of-type(1) > strong")
-        west_tower = get_text(f"{west_base} > li:nth-of-type(2) > div > div:nth-of-type(2) > div:nth-of-type(1) > strong")
-        west_p4 = get_text(f"{west_base} > li:nth-of-type(3) > div > div:nth-of-type(2) > div:nth-of-type(1) > strong")
-
-        result["longTerm"] = {
+        lt_data = {
             "east": {
-                "p1": {"available": extract_num(east_p1), "name": "장기주차장 P1"},
-                "tower": {"available": extract_num(east_tower), "name": "주차타워 동편"},
-                "p3": {"available": extract_num(east_p3), "name": "장기주차장 P3"}
+                "p1": {"available": 0, "name": "장기주차장 P1"},
+                "tower": {"available": 0, "name": "주차타워 동편"},
+                "p3": {"available": 0, "name": "장기주차장 P3"}
             },
             "west": {
-                "p2": {"available": extract_num(west_p2), "name": "장기주차장 P2"},
-                "tower": {"available": extract_num(west_tower), "name": "주차타워 서편"},
-                "p4": {"available": extract_num(west_p4), "name": "장기주차장 P4"}
+                "p2": {"available": 0, "name": "장기주차장 P2"},
+                "tower": {"available": 0, "name": "주차타워 서편"},
+                "p4": {"available": 0, "name": "장기주차장 P4"}
             }
         }
+
+        # We need to distinguish East vs West.
+        # Usually they are in separate divs.
+        # Let's iterate through the main divs and check their content.
+        
+        # Strategy: Find all ULs, check the labels inside.
+        # If P1/P3 -> East
+        # If P2/P4 -> West
+        
+        uls = container.select("ul")
+        for ul in uls:
+            items = ul.select("li")
+            is_east = False
+            is_west = False
+            
+            # First pass to identify section
+            for item in items:
+                label = item.select_one(".num-txt")
+                if not label: continue
+                txt = label.get_text(strip=True)
+                if "P1" in txt or "P3" in txt:
+                    is_east = True
+                if "P2" in txt or "P4" in txt:
+                    is_west = True
+            
+            # Second pass to extract data
+            for item in items:
+                label_el = item.select_one(".num-txt")
+                val_el = item.select_one(".num-noti strong")
+                
+                if not label_el or not val_el:
+                    continue
+                    
+                label = label_el.get_text(strip=True)
+                val_text = val_el.get_text(strip=True)
+                val = int(re.sub(r'[^0-9]', '', val_text)) if val_text else 0
+                
+                if is_east:
+                    if "P1" in label:
+                        lt_data["east"]["p1"]["available"] = val
+                    elif "P3" in label:
+                        lt_data["east"]["p3"]["available"] = val
+                    elif "주차타워" in label:
+                        lt_data["east"]["tower"]["available"] = val
+                elif is_west:
+                    if "P2" in label:
+                        lt_data["west"]["p2"]["available"] = val
+                    elif "P4" in label:
+                        lt_data["west"]["p4"]["available"] = val
+                    elif "주차타워" in label:
+                        lt_data["west"]["tower"]["available"] = val
+
+        result["longTerm"] = lt_data
 
     except Exception as e:
         print(f"Error fetching long-term parking: {e}")
