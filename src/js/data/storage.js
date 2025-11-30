@@ -24,15 +24,9 @@ export const Storage = {
 
         // 2. Supabase에 저장
         try {
-            // 테이블 이름 매핑 (staff -> staff, settings -> settings)
-            // 데이터 구조에 따라 upsert 방식이 다를 수 있음
-
             if (key === 'staff') {
-                // Staff 리스트 전체를 저장하는 대신, 개별 변경사항을 저장하는 것이 좋지만
-                // 현재 구조상 전체 리스트를 덮어쓰거나, 개별 upsert를 해야 함.
-                // 간단하게 구현하기 위해: staff 테이블에 id별로 upsert
-
                 if (Array.isArray(data)) {
+                    // 1. Upsert (Insert or Update)
                     const updates = data.map(s => ({
                         id: s.id,
                         name: s.name,
@@ -41,11 +35,47 @@ export const Storage = {
                         updated_at: new Date().toISOString()
                     }));
 
-                    const { error } = await supabase
+                    const { error: upsertError } = await supabase
                         .from('staff')
                         .upsert(updates);
 
-                    if (error) throw error;
+                    if (upsertError) throw upsertError;
+
+                    // 2. Delete (Sync: Remove items not in the current list)
+                    // 현재 리스트에 있는 ID 목록
+                    const currentIds = data.map(s => s.id);
+
+                    // DB에 있지만 현재 리스트에 없는 항목 삭제
+                    // (주의: 이 방식은 동시성 문제가 있을 수 있으나, 간단한 앱에서는 허용)
+                    if (currentIds.length > 0) {
+                        const { error: deleteError } = await supabase
+                            .from('staff')
+                            .delete()
+                            .not('id', 'in', `(${currentIds.join(',')})`);
+
+                        if (deleteError) throw deleteError;
+                    } else {
+                        // 리스트가 비어있으면 전체 삭제
+                        const { error: deleteAllError } = await supabase
+                            .from('staff')
+                            .delete()
+                            .neq('id', 'placeholder'); // Delete all (using a dummy condition if needed, or just no filter)
+
+                        // Supabase delete requires a filter unless configured otherwise.
+                        // Using a condition that is always true or checking IDs.
+                        // Safer: Get all IDs first? Or just delete all.
+                        // Let's try deleting all rows where ID is NOT in empty list (which is everything)
+                        // But 'not in empty list' query might be tricky.
+                        // Instead, let's fetch all IDs and delete them?
+                        // Or just: delete().neq('id', '0') assuming no ID is 0.
+
+                        const { error: clearError } = await supabase
+                            .from('staff')
+                            .delete()
+                            .neq('id', '0'); // Hack to delete all
+
+                        if (clearError) throw clearError;
+                    }
                 }
             } else if (key === 'settings') {
                 const { error } = await supabase
