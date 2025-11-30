@@ -122,12 +122,12 @@ class App {
 
       const updateStatus = (status) => {
         const dot = statusIndicator.querySelector('span');
-        if (status === 'CONNECTED') {
+        if (status === 'SUBSCRIBED') {
           dot.style.background = '#10b981'; // Green
           statusIndicator.innerHTML = '<span style="width: 8px; height: 8px; background: #10b981; border-radius: 50%;"></span> Cloud Active';
-        } else if (status === 'DISCONNECTED') {
+        } else if (status === 'DISCONNECTED' || status === 'CLOSED' || status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
           dot.style.background = '#ef4444'; // Red
-          statusIndicator.innerHTML = '<span style="width: 8px; height: 8px; background: #ef4444; border-radius: 50%;"></span> Disconnected';
+          statusIndicator.innerHTML = `<span style="width: 8px; height: 8px; background: #ef4444; border-radius: 50%;"></span> ${status}`;
         } else {
           statusIndicator.innerHTML = `<span style="width: 8px; height: 8px; background: #fbbf24; border-radius: 50%;"></span> ${status}`;
         }
