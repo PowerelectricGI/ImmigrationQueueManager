@@ -114,21 +114,47 @@ class App {
       });
 
       // 6. 실시간 구독 시작
+      const statusIndicator = document.createElement('div');
+      statusIndicator.id = 'sync-status';
+      statusIndicator.style.cssText = 'position: fixed; bottom: 10px; right: 10px; padding: 5px 10px; background: rgba(0,0,0,0.7); color: white; border-radius: 20px; font-size: 12px; z-index: 9999; display: flex; align-items: center; gap: 5px;';
+      statusIndicator.innerHTML = '<span style="width: 8px; height: 8px; background: #fbbf24; border-radius: 50%;"></span> Connecting...';
+      document.body.appendChild(statusIndicator);
+
+      const updateStatus = (status) => {
+        const dot = statusIndicator.querySelector('span');
+        if (status === 'CONNECTED') {
+          dot.style.background = '#10b981'; // Green
+          statusIndicator.innerHTML = '<span style="width: 8px; height: 8px; background: #10b981; border-radius: 50%;"></span> Cloud Active';
+        } else if (status === 'DISCONNECTED') {
+          dot.style.background = '#ef4444'; // Red
+          statusIndicator.innerHTML = '<span style="width: 8px; height: 8px; background: #ef4444; border-radius: 50%;"></span> Disconnected';
+        } else {
+          statusIndicator.innerHTML = `<span style="width: 8px; height: 8px; background: #fbbf24; border-radius: 50%;"></span> ${status}`;
+        }
+      };
+
       Storage.subscribe(
         (updatedStaffList) => {
           console.log('Realtime update: Staff list');
           this.state.staffList = updatedStaffList;
           this.staffUI.setStaffList(updatedStaffList);
           this.dashboard.updateStaffList(updatedStaffList);
-          // Update local cache without triggering save loop (Storage.save handles this gracefully usually, but be careful)
           localStorage.setItem(STORAGE_KEYS.STAFF, JSON.stringify(updatedStaffList));
+
+          // Flash indicator
+          const originalText = statusIndicator.innerHTML;
+          statusIndicator.innerHTML = '<span style="width: 8px; height: 8px; background: #3b82f6; border-radius: 50%;"></span> Syncing...';
+          setTimeout(() => { statusIndicator.innerHTML = originalText; }, 1000);
         },
         (updatedSettings) => {
           console.log('Realtime update: Settings');
           this.state.settings = updatedSettings;
-          this.eventBus.emit('settings:changed', updatedSettings); // This might trigger save loop?
-          // Update local cache
+          this.eventBus.emit('settings:changed', updatedSettings);
           localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(updatedSettings));
+        },
+        (status) => {
+          console.log('Subscription Status:', status);
+          updateStatus(status);
         }
       );
 

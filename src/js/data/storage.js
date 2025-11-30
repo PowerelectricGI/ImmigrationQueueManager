@@ -135,44 +135,6 @@ export const Storage = {
         }
     },
 
-    /**
-     * 실시간 구독
-     * @param {Function} onStaffChange 
-     * @param {Function} onSettingsChange 
-     */
-    subscribe(onStaffChange, onSettingsChange) {
-        const channel = supabase.channel('schema-db-changes')
-            .on(
-                'postgres_changes',
-                { event: '*', schema: 'public', table: 'staff' },
-                (payload) => {
-                    console.log('Staff change received:', payload);
-                    // 전체 리스트를 다시 가져오는 것이 가장 안전함 (순서 등 고려)
-                    this.fetchLatest('staff').then(data => {
-                        if (data) onStaffChange(data);
-                    });
-                }
-            )
-            .on(
-                'postgres_changes',
-                { event: '*', schema: 'public', table: 'settings' },
-                (payload) => {
-                    console.log('Settings change received:', payload);
-                    if (payload.new && payload.new.config) {
-                        onSettingsChange(payload.new.config);
-                    }
-                }
-            )
-            .subscribe();
-
-        return channel;
-    },
-
-    remove(key) {
-        localStorage.removeItem(key);
-        // Supabase 삭제 로직은 필요시 구현 (현재는 전체 삭제 기능이 없으므로 패스)
-    },
-
     has(key) {
         return localStorage.getItem(key) !== null;
     }
