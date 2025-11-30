@@ -155,10 +155,13 @@ class App {
 
         try {
           const forecast = await AirportDataImporter.importFromFile(file);
+          
+          // 먼저 뷰를 전환한 후 데이터 업데이트 (렌더링 순서 보장)
+          this.dashboard.switchView('arrival');
+          this.updateActiveNav('arrival');
           this.updateForecast(forecast);
+          
           alert('데이터를 성공적으로 불러왔습니다.');
-          this.dashboard.switchView('dashboard');
-          this.updateActiveNav('dashboard');
         } catch (error) {
           console.error(error);
           alert(`데이터 불러오기 실패: ${error.message}`);
@@ -202,11 +205,13 @@ class App {
           }
 
           const forecast = await AirportDataImporter.fetchFromApi(selectedDate);
+          
+          // 먼저 뷰를 전환한 후 데이터 업데이트 (렌더링 순서 보장)
+          this.dashboard.switchView('arrival');
+          this.updateActiveNav('arrival');
           this.updateForecast(forecast);
+          
           alert('인천공항 실시간 데이터를 성공적으로 가져왔습니다.');
-
-          this.dashboard.switchView('dashboard');
-          this.updateActiveNav('dashboard');
         } catch (error) {
           console.error(error);
           alert(`데이터 가져오기 실패: ${error.message}\n서버가 실행 중인지 확인해주세요.`);
@@ -221,12 +226,11 @@ class App {
     const sampleBtn = document.getElementById('btn-sample-data');
     if (sampleBtn) {
       sampleBtn.addEventListener('click', () => {
+        // 먼저 뷰를 전환한 후 데이터 업데이트 (렌더링 순서 보장)
+        this.dashboard.switchView('arrival');
+        this.updateActiveNav('arrival');
         this.updateForecast(SampleForecast);
         alert('샘플 데이터가 로드되었습니다.');
-        this.dashboard.switchView('dashboard');
-        document.querySelectorAll('.nav-item').forEach(nav => {
-          nav.classList.toggle('active', nav.dataset.view === 'dashboard');
-        });
       });
     }
 
@@ -295,14 +299,12 @@ class App {
       hourlyData
     };
 
+    // 먼저 뷰를 전환한 후 데이터 업데이트 (렌더링 순서 보장)
+    this.dashboard.switchView('arrival');
+    this.updateActiveNav('arrival');
     this.updateForecast(forecast);
+    
     alert('데이터가 저장되었습니다.');
-
-    // 대시보드로 전환
-    this.dashboard.switchView('dashboard');
-    document.querySelectorAll('.nav-item').forEach(nav => {
-      nav.classList.toggle('active', nav.dataset.view === 'dashboard');
-    });
   }
 
   updateForecast(forecast) {
