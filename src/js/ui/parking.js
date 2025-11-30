@@ -102,32 +102,30 @@ export class ParkingUI {
 
     /**
      * 주차장 카드 렌더링
-     * @param {Object} data - 주차장 데이터 { available, total, name }
+     * @param {Object} data - 주차장 데이터 { available, name }
      * @param {string} id - 고유 ID
      * @returns {string} HTML 문자열
      */
     renderParkingCard(data, id) {
         const available = data.available;
-        const total = data.total;
         const name = data.name;
 
-        // 여유 상태 판단
+        // 여유 상태 판단 (주차 가능 대수 기준)
         let statusClass = 'status-normal';
         let statusText = '여유';
         let statusIcon = '🟢';
 
-        if (typeof available === 'number' && typeof total === 'number' && total > 0) {
-            const ratio = available / total;
-            if (ratio <= 0.1) {
+        if (typeof available === 'number') {
+            if (available <= 50) {
                 statusClass = 'status-critical';
                 statusText = '혼잡';
                 statusIcon = '🔴';
-            } else if (ratio <= 0.3) {
+            } else if (available <= 150) {
                 statusClass = 'status-warning';
                 statusText = '보통';
                 statusIcon = '🟡';
             }
-        } else if (available === '-') {
+        } else if (available === '-' || available === 0) {
             statusClass = 'status-unknown';
             statusText = '확인불가';
             statusIcon = '⚪';
@@ -141,19 +139,9 @@ export class ParkingUI {
                 </div>
                 <div class="parking-card-body">
                     <div class="parking-available">
-                        <span class="available-number">${available}</span>
+                        <span class="available-number">${typeof available === 'number' ? available.toLocaleString() : available}</span>
                         <span class="available-label">주차가능</span>
                     </div>
-                    ${total !== '-' && total > 0 ? `
-                        <div class="parking-total">
-                            <span class="total-label">/ ${total} 총</span>
-                        </div>
-                        <div class="parking-progress">
-                            <div class="progress-bar">
-                                <div class="progress-fill ${statusClass}" style="width: ${this.calculatePercent(available, total)}%"></div>
-                            </div>
-                        </div>
-                    ` : ''}
                 </div>
             </div>
         `;
@@ -171,19 +159,6 @@ export class ParkingUI {
                 <div class="empty-hint">위의 "주차장 현황 가져오기" 버튼을 클릭하세요</div>
             </div>
         `;
-    }
-
-    /**
-     * 퍼센트 계산
-     * @param {number} available - 주차 가능 대수
-     * @param {number} total - 총 대수
-     * @returns {number} 퍼센트
-     */
-    calculatePercent(available, total) {
-        if (typeof available !== 'number' || typeof total !== 'number' || total === 0) {
-            return 0;
-        }
-        return Math.round((available / total) * 100);
     }
 
     /**

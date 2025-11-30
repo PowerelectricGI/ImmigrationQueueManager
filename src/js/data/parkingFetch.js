@@ -9,7 +9,7 @@ import { generateUUID } from '../utils/helpers.js';
  * 주차장 데이터 Fetcher
  */
 export class ParkingDataFetcher {
-    // CORS 프록시 목록 (browserFetch.js와 동일)
+    // CORS 프록시 목록
     static CORS_PROXIES = [
         {
             name: 'AllOrigins',
@@ -30,7 +30,59 @@ export class ParkingDataFetcher {
     };
 
     /**
+     * XPath로 요소 찾기 (브라우저 환경)
+     * @param {Document} doc - DOM Document
+     * @param {string} xpath - XPath 문자열
+     * @returns {string|null} 텍스트 내용
+     */
+    static getTextByXPath(doc, xpath) {
+        try {
+            const result = doc.evaluate(xpath, doc, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null);
+            if (result.singleNodeValue) {
+                return result.singleNodeValue.textContent.trim();
+            }
+        } catch (e) {
+            console.warn('XPath evaluation failed:', xpath, e);
+        }
+        return null;
+    }
+
+    /**
+     * CSS 선택자로 요소 찾기 (XPath 대체)
+     * @param {Document} doc - DOM Document
+     * @param {string} selector - CSS 선택자
+     * @returns {string|null} 텍스트 내용
+     */
+    static getTextBySelector(doc, selector) {
+        try {
+            const element = doc.querySelector(selector);
+            if (element) {
+                return element.textContent.trim();
+            }
+        } catch (e) {
+            console.warn('Selector failed:', selector, e);
+        }
+        return null;
+    }
+
+    /**
+     * 숫자 추출
+     * @param {string} text - 텍스트
+     * @returns {number} 숫자 (없으면 0)
+     */
+    static extractNumber(text) {
+        if (!text) return 0;
+        const match = text.replace(/,/g, '').match(/\d+/);
+        return match ? parseInt(match[0], 10) : 0;
+    }
+
+    /**
      * 단기주차장 HTML 파싱
+     * XPath 기반:
+     * - 지상 1층: //*[@id="menu964_obj1181"]/div/div[4]/ul/li[1]/div/div[2]/div[1]
+     * - 지하 1층: //*[@id="menu964_obj1181"]/div/div[4]/ul/li[2]/div/div[2]/div[1]
+     * - 지하 2층: //*[@id="menu964_obj1181"]/div/div[4]/ul/li[3]/div/div[2]/div[1]
+     * 
      * @param {string} html - HTML 문자열
      * @returns {Object} 단기주차장 데이터
      */
@@ -38,67 +90,61 @@ export class ParkingDataFetcher {
         const parser = new DOMParser();
         const doc = parser.parseFromString(html, 'text/html');
 
-        // 주차 현황 테이블 또는 div 찾기
-        // 인천공항 페이지 구조에 따라 조정 필요
         const result = {
-            floor1: { available: 0, total: 0, name: '지상 1층' },
-            basement1: { available: 0, total: 0, name: '지하 1층' },
-            basement2: { available: 0, total: 0, name: '지하 2층' }
+            floor1: { available: 0, name: '지상 1층' },
+            basement1: { available: 0, name: '지하 1층' },
+            basement2: { available: 0, name: '지하 2층' }
         };
 
         try {
-            // 방법 1: 테이블에서 데이터 추출 시도
-            const tables = doc.querySelectorAll('table');
-            for (const table of tables) {
-                const rows = table.querySelectorAll('tr');
-                for (const row of rows) {
-                    const cells = row.querySelectorAll('td, th');
-                    const text = row.textContent;
+            // CSS 선택자로 변환 (XPath 대응)
+            // #menu964_obj1181 > div > div:nth-child(4) > ul > li:nth-child(N) > div > div:nth-child(2) > div:first-child
+            const baseSelector = '#menu964_obj1181';
+            
+            // 지상 1층
+            const floor1Text = this.getTextBySelector(doc, 
+                `${baseSelector} > div > div:nth-child(4) > ul > li:nth-child(1) > div > div:nth-child(2) > div:first-child`
+            ) || this.getTextBySelector(doc,
+                `${baseSelector} div > div:nth-of-type(4) ul li:nth-child(1) div div:nth-of-type(2) div:first-child`
+            );
+            result.floor1.available = this.extractNumber(floor1Text);
 
-                    if (text.includes('지상') || text.includes('1층') || text.includes('1F')) {
-                        const numbers = this.extractNumbers(row);
-                        if (numbers.length >= 1) {
-                            result.floor1.available = numbers[0];
-                            if (numbers.length >= 2) result.floor1.total = numbers[1];
+            // 지하 1층
+            const basement1Text = this.getTextBySelector(doc,
+                `${baseSelector} > div > div:nth-child(4) > ul > li:nth-child(2) > div > div:nth-child(2) > div:first-child`
+            ) || this.getTextBySelector(doc,
+                `${baseSelector} div > div:nth-of-type(4) ul li:nth-child(2) div div:nth-of-type(2) div:first-child`
+            );
+            result.basement1.available = this.extractNumber(basement1Text);
+
+            // 지하 2층
+            const basement2Text = this.getTextBySelector(doc,
+                `${baseSelector} > div > div:nth-child(4) > ul > li:nth-child(3) > div > div:nth-child(2) > div:first-child`
+            ) || this.getTextBySelector(doc,
+                `${baseSelector} div > div:nth-of-type(4) ul li:nth-child(3) div div:nth-of-type(2) div:first-child`
+            );
+            result.basement2.available = this.extractNumber(basement2Text);
+
+            // 대체 방법: li 요소들을 순회하며 찾기
+            if (result.floor1.available === 0 && result.basement1.available === 0) {
+                const container = doc.querySelector('#menu964_obj1181');
+                if (container) {
+                    const listItems = container.querySelectorAll('ul li');
+                    listItems.forEach((li, index) => {
+                        // div > div:nth-child(2) > div:first-child 에서 숫자 찾기
+                        const numDiv = li.querySelector('div > div:nth-child(2) > div:first-child') ||
+                                       li.querySelector('div div:nth-of-type(2) div:first-child');
+                        if (numDiv) {
+                            const num = this.extractNumber(numDiv.textContent);
+                            if (index === 0) result.floor1.available = num;
+                            else if (index === 1) result.basement1.available = num;
+                            else if (index === 2) result.basement2.available = num;
                         }
-                    }
-                    if (text.includes('지하 1') || text.includes('B1')) {
-                        const numbers = this.extractNumbers(row);
-                        if (numbers.length >= 1) {
-                            result.basement1.available = numbers[0];
-                            if (numbers.length >= 2) result.basement1.total = numbers[1];
-                        }
-                    }
-                    if (text.includes('지하 2') || text.includes('B2')) {
-                        const numbers = this.extractNumbers(row);
-                        if (numbers.length >= 1) {
-                            result.basement2.available = numbers[0];
-                            if (numbers.length >= 2) result.basement2.total = numbers[1];
-                        }
-                    }
+                    });
                 }
             }
 
-            // 방법 2: 특정 클래스나 ID로 찾기
-            const parkingItems = doc.querySelectorAll('.parking-item, .park-info, [class*="parking"]');
-            parkingItems.forEach(item => {
-                const text = item.textContent;
-                const numbers = this.extractNumbers(item);
-
-                if (text.includes('지상') && numbers.length >= 1) {
-                    result.floor1.available = numbers[0];
-                }
-                if (text.includes('지하 1') || text.includes('지하1')) {
-                    if (numbers.length >= 1) result.basement1.available = numbers[0];
-                }
-                if (text.includes('지하 2') || text.includes('지하2')) {
-                    if (numbers.length >= 1) result.basement2.available = numbers[0];
-                }
-            });
-
-            // 방법 3: 숫자가 큰 span/div 요소 찾기 (주차 가능 대수는 보통 큰 숫자로 표시)
-            const numberElements = doc.querySelectorAll('.num, .count, .available, [class*="num"]');
-            // 구체적인 파싱은 실제 페이지 구조 확인 후 조정
+            console.log('단기주차장 파싱 결과:', result);
 
         } catch (error) {
             console.error('단기주차장 파싱 오류:', error);
@@ -109,6 +155,16 @@ export class ParkingDataFetcher {
 
     /**
      * 장기주차장 HTML 파싱
+     * XPath 기반:
+     * 동편 (div[4]):
+     * - 장기주차장 P1: //*[@id="menu965_obj1182"]/div/div[4]/ul/li[1]/div/div[2]/div[1]
+     * - 주차타워 동편: //*[@id="menu965_obj1182"]/div/div[4]/ul/li[2]/div/div[2]/div[1]
+     * - 장기주차장 P3: //*[@id="menu965_obj1182"]/div/div[4]/ul/li[3]/div/div[2]/div[1]
+     * 서편 (div[5]):
+     * - 장기주차 P2: //*[@id="menu965_obj1182"]/div/div[5]/ul/li[1]/div/div[2]/div[1]
+     * - 주차타워 서편: //*[@id="menu965_obj1182"]/div/div[5]/ul/li[2]/div/div[2]/div[1]
+     * - 장기주차 P4: //*[@id="menu965_obj1182"]/div/div[5]/ul/li[3]/div/div[2]/div[1]
+     * 
      * @param {string} html - HTML 문자열
      * @returns {Object} 장기주차장 데이터
      */
@@ -118,68 +174,97 @@ export class ParkingDataFetcher {
 
         const result = {
             east: {
-                p1: { available: 0, total: 0, name: '장기주차장 P1' },
-                tower: { available: 0, total: 0, name: '주차타워 동편' },
-                p3: { available: 0, total: 0, name: '장기주차장 P3' }
+                p1: { available: 0, name: '장기주차장 P1' },
+                tower: { available: 0, name: '주차타워 동편' },
+                p3: { available: 0, name: '장기주차장 P3' }
             },
             west: {
-                p2: { available: 0, total: 0, name: '장기주차장 P2' },
-                tower: { available: 0, total: 0, name: '주차타워 서편' },
-                p4: { available: 0, total: 0, name: '장기주차장 P4' }
+                p2: { available: 0, name: '장기주차장 P2' },
+                tower: { available: 0, name: '주차타워 서편' },
+                p4: { available: 0, name: '장기주차장 P4' }
             }
         };
 
         try {
-            // 테이블에서 데이터 추출
-            const tables = doc.querySelectorAll('table');
-            for (const table of tables) {
-                const rows = table.querySelectorAll('tr');
-                for (const row of rows) {
-                    const text = row.textContent;
-                    const numbers = this.extractNumbers(row);
+            const baseSelector = '#menu965_obj1182';
 
-                    // 동편
-                    if ((text.includes('P1') || text.includes('장기주차장 P1')) && !text.includes('P1') === false) {
-                        if (text.includes('P1') && !text.includes('P2')) {
-                            if (numbers.length >= 1) result.east.p1.available = numbers[0];
+            // 동편 (div:nth-child(4))
+            // 장기주차장 P1
+            const p1Text = this.getTextBySelector(doc,
+                `${baseSelector} > div > div:nth-child(4) > ul > li:nth-child(1) > div > div:nth-child(2) > div:first-child`
+            );
+            result.east.p1.available = this.extractNumber(p1Text);
+
+            // 주차타워 동편
+            const towerEastText = this.getTextBySelector(doc,
+                `${baseSelector} > div > div:nth-child(4) > ul > li:nth-child(2) > div > div:nth-child(2) > div:first-child`
+            );
+            result.east.tower.available = this.extractNumber(towerEastText);
+
+            // 장기주차장 P3
+            const p3Text = this.getTextBySelector(doc,
+                `${baseSelector} > div > div:nth-child(4) > ul > li:nth-child(3) > div > div:nth-child(2) > div:first-child`
+            );
+            result.east.p3.available = this.extractNumber(p3Text);
+
+            // 서편 (div:nth-child(5))
+            // 장기주차장 P2
+            const p2Text = this.getTextBySelector(doc,
+                `${baseSelector} > div > div:nth-child(5) > ul > li:nth-child(1) > div > div:nth-child(2) > div:first-child`
+            );
+            result.west.p2.available = this.extractNumber(p2Text);
+
+            // 주차타워 서편
+            const towerWestText = this.getTextBySelector(doc,
+                `${baseSelector} > div > div:nth-child(5) > ul > li:nth-child(2) > div > div:nth-child(2) > div:first-child`
+            );
+            result.west.tower.available = this.extractNumber(towerWestText);
+
+            // 장기주차장 P4
+            const p4Text = this.getTextBySelector(doc,
+                `${baseSelector} > div > div:nth-child(5) > ul > li:nth-child(3) > div > div:nth-child(2) > div:first-child`
+            );
+            result.west.p4.available = this.extractNumber(p4Text);
+
+            // 대체 방법: 컨테이너에서 직접 찾기
+            if (result.east.p1.available === 0 && result.west.p2.available === 0) {
+                const container = doc.querySelector('#menu965_obj1182');
+                if (container) {
+                    const divs = container.querySelectorAll(':scope > div > div');
+                    
+                    divs.forEach((div, divIndex) => {
+                        const listItems = div.querySelectorAll('ul li');
+                        if (listItems.length >= 3) {
+                            listItems.forEach((li, liIndex) => {
+                                const numDiv = li.querySelector('div > div:nth-child(2) > div:first-child') ||
+                                               li.querySelector('div div:nth-of-type(2) div:first-child');
+                                if (numDiv) {
+                                    const num = this.extractNumber(numDiv.textContent);
+                                    
+                                    // div[4] = index 3 (동편), div[5] = index 4 (서편)
+                                    if (divIndex === 3) { // 동편
+                                        if (liIndex === 0) result.east.p1.available = num;
+                                        else if (liIndex === 1) result.east.tower.available = num;
+                                        else if (liIndex === 2) result.east.p3.available = num;
+                                    } else if (divIndex === 4) { // 서편
+                                        if (liIndex === 0) result.west.p2.available = num;
+                                        else if (liIndex === 1) result.west.tower.available = num;
+                                        else if (liIndex === 2) result.west.p4.available = num;
+                                    }
+                                }
+                            });
                         }
-                    }
-                    if (text.includes('주차타워') && text.includes('동')) {
-                        if (numbers.length >= 1) result.east.tower.available = numbers[0];
-                    }
-                    if (text.includes('P3')) {
-                        if (numbers.length >= 1) result.east.p3.available = numbers[0];
-                    }
-
-                    // 서편
-                    if (text.includes('P2') && !text.includes('P1')) {
-                        if (numbers.length >= 1) result.west.p2.available = numbers[0];
-                    }
-                    if (text.includes('주차타워') && text.includes('서')) {
-                        if (numbers.length >= 1) result.west.tower.available = numbers[0];
-                    }
-                    if (text.includes('P4')) {
-                        if (numbers.length >= 1) result.west.p4.available = numbers[0];
-                    }
+                    });
                 }
             }
+
+            console.log('장기주차장 파싱 결과:', result);
 
         } catch (error) {
             console.error('장기주차장 파싱 오류:', error);
         }
 
         return result;
-    }
-
-    /**
-     * 요소에서 숫자 추출
-     * @param {Element} element - DOM 요소
-     * @returns {number[]} 숫자 배열
-     */
-    static extractNumbers(element) {
-        const text = element.textContent;
-        const matches = text.match(/\d+/g);
-        return matches ? matches.map(n => parseInt(n, 10)) : [];
     }
 
     /**
@@ -246,9 +331,9 @@ export class ParkingDataFetcher {
             result.errors.push(`단기주차장: ${error.message}`);
             // 기본값 설정
             result.shortTerm = {
-                floor1: { available: '-', total: '-', name: '지상 1층' },
-                basement1: { available: '-', total: '-', name: '지하 1층' },
-                basement2: { available: '-', total: '-', name: '지하 2층' }
+                floor1: { available: '-', name: '지상 1층' },
+                basement1: { available: '-', name: '지하 1층' },
+                basement2: { available: '-', name: '지하 2층' }
             };
         }
 
@@ -263,14 +348,14 @@ export class ParkingDataFetcher {
             // 기본값 설정
             result.longTerm = {
                 east: {
-                    p1: { available: '-', total: '-', name: '장기주차장 P1' },
-                    tower: { available: '-', total: '-', name: '주차타워 동편' },
-                    p3: { available: '-', total: '-', name: '장기주차장 P3' }
+                    p1: { available: '-', name: '장기주차장 P1' },
+                    tower: { available: '-', name: '주차타워 동편' },
+                    p3: { available: '-', name: '장기주차장 P3' }
                 },
                 west: {
-                    p2: { available: '-', total: '-', name: '장기주차장 P2' },
-                    tower: { available: '-', total: '-', name: '주차타워 서편' },
-                    p4: { available: '-', total: '-', name: '장기주차장 P4' }
+                    p2: { available: '-', name: '장기주차장 P2' },
+                    tower: { available: '-', name: '주차타워 서편' },
+                    p4: { available: '-', name: '장기주차장 P4' }
                 }
             };
         }
@@ -287,20 +372,20 @@ export class ParkingDataFetcher {
             id: generateUUID(),
             lastUpdated: new Date().toISOString(),
             shortTerm: {
-                floor1: { available: 245, total: 500, name: '지상 1층' },
-                basement1: { available: 189, total: 450, name: '지하 1층' },
-                basement2: { available: 312, total: 600, name: '지하 2층' }
+                floor1: { available: 245, name: '지상 1층' },
+                basement1: { available: 189, name: '지하 1층' },
+                basement2: { available: 312, name: '지하 2층' }
             },
             longTerm: {
                 east: {
-                    p1: { available: 523, total: 1200, name: '장기주차장 P1' },
-                    tower: { available: 156, total: 800, name: '주차타워 동편' },
-                    p3: { available: 789, total: 1500, name: '장기주차장 P3' }
+                    p1: { available: 523, name: '장기주차장 P1' },
+                    tower: { available: 156, name: '주차타워 동편' },
+                    p3: { available: 789, name: '장기주차장 P3' }
                 },
                 west: {
-                    p2: { available: 445, total: 1100, name: '장기주차장 P2' },
-                    tower: { available: 201, total: 750, name: '주차타워 서편' },
-                    p4: { available: 612, total: 1400, name: '장기주차장 P4' }
+                    p2: { available: 445, name: '장기주차장 P2' },
+                    tower: { available: 201, name: '주차타워 서편' },
+                    p4: { available: 612, name: '장기주차장 P4' }
                 }
             },
             errors: [],
