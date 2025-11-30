@@ -209,16 +209,23 @@ export class ParkingDataFetcher {
      */
     static async fetchWithProxy(url) {
         const enabledProxies = this.CORS_PROXIES.filter(p => p.enabled);
+        const timestamp = new Date().getTime(); // Cache buster
 
         for (const proxy of enabledProxies) {
-            const proxyUrl = proxy.url + encodeURIComponent(url);
+            // Append timestamp to the original URL or the proxy URL to ensure uniqueness
+            const separator = url.includes('?') ? '&' : '?';
+            const urlWithCacheBuster = `${url}${separator}_t=${timestamp}`;
+
+            const proxyUrl = proxy.url + encodeURIComponent(urlWithCacheBuster);
             console.log(`Fetching parking data via ${proxy.name}: ${proxyUrl}`);
 
             try {
                 const response = await fetch(proxyUrl, {
                     method: 'GET',
                     headers: {
-                        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
+                        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+                        'Cache-Control': 'no-cache',
+                        'Pragma': 'no-cache'
                     }
                 });
 
