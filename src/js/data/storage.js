@@ -61,81 +61,45 @@ export const Storage = {
                             .delete()
                             .neq('id', 'placeholder'); // Delete all (using a dummy condition if needed, or just no filter)
 
-                        // Supabase delete requires a filter unless configured otherwise.
-                        // Using a condition that is always true or checking IDs.
-                        // Safer: Get all IDs first? Or just delete all.
-                        // Let's try deleting all rows where ID is NOT in empty list (which is everything)
-                        // But 'not in empty list' query might be tricky.
-                        // Instead, let's fetch all IDs and delete them?
-                        // Or just: delete().neq('id', '0') assuming no ID is 0.
-
-                        const { error: clearError } = await supabase
-                            .from('staff')
-                            .delete()
-                            .neq('id', '0'); // Hack to delete all
-
-                        if (clearError) throw clearError;
-                    }
-                }
-            } else if (key === 'settings') {
-                const { error } = await supabase
-                    .from('settings')
-                    .upsert({
-                        id: 'global_settings',
-                        config: data,
-                        updated_at: new Date().toISOString()
-                    });
-
-                if (error) throw error;
-            }
-
-            return true;
-        } catch (error) {
-            console.error('Supabase save failed:', error);
-            return false;
-        }
-    },
-
-    /**
      * 데이터 불러오기
-     * @param {string} key 
-     */
-    load(key) {
-        // 동기적으로 LocalStorage 반환 (초기 렌더링용)
-        try {
-            const serialized = localStorage.getItem(key);
-            return serialized ? JSON.parse(serialized) : null;
-        } catch (error) {
-            return null;
-        }
-    },
+                            * @param { string } key
+                                */
+                        load(key) {
+                            // 동기적으로 LocalStorage 반환 (초기 렌더링용)
+                            try {
+                                const serialized = localStorage.getItem(key);
+                                return serialized ? JSON.parse(serialized) : null;
+                            } catch (error) {
+                                return null;
+                            }
+                        },
 
     /**
      * Supabase에서 최신 데이터 가져오기 (비동기)
      * @param {string} key 
      */
     async fetchLatest(key) {
-        try {
-            if (key === 'staff') {
-                const { data, error } = await supabase.from('staff').select('*');
-                if (error) throw error;
-                return data;
-            } else if (key === 'settings') {
-                const { data, error } = await supabase
-                    .from('settings')
-                    .select('config')
-                    .eq('id', 'global_settings')
-                    .single();
-                if (error) throw error;
-                return data?.config || null;
-            }
-        } catch (error) {
-            console.error(`Failed to fetch latest ${key}:`, error);
-            return null;
-        }
-    },
+                            try {
+                                if (key === 'staff') {
+                                    const { data, error } = await supabase.from('staff').select('*');
+                                    if (error) throw error;
+                                    return data;
+                                } else if (key === 'settings') {
+                                    const { data, error } = await supabase
+                                        .from('settings')
+                                        .select('config')
+                                        .eq('id', 'global_settings')
+                                        .single();
+                                    if (error) throw error;
+                                    return data?.config || null;
+                                }
+                            } catch (error) {
+                                console.error(`Failed to fetch latest ${key}:`, error);
+                                return null;
+                            }
+                        },
 
-    has(key) {
-        return localStorage.getItem(key) !== null;
-    }
-};
+                        has(key) {
+                            return localStorage.getItem(key) !== null;
+                        }
+                    };
