@@ -1070,52 +1070,62 @@ input[type="range"]::-moz-range-thumb {
    Updated Footer Styles
    ============================================ */
 .app-footer {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: auto;
-    min-height: 60px;
-    background-color: var(--color-bg-secondary);
-    border-top: 1px solid var(--border-color);
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    padding-top: 5px;
-    padding-bottom: calc(5px + env(safe-area-inset-bottom));
-    z-index: var(--z-dropdown);
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: auto;
+  min-height: 60px;
+  background-color: var(--color-bg-secondary);
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding-top: 5px;
+  padding-bottom: calc(5px + env(safe-area-inset-bottom));
+  z-index: var(--z-dropdown);
 }
 
 .nav-items-container {
-    display: flex;
-    justify-content: space-around;
-    width: 100%;
-    align-items: center;
+  display: flex;
+  justify-content: space-around;
+  width: 100%;
+  align-items: center;
 }
 
 .footer-copyright {
-    font-size: 0.6rem;
-    color: var(--color-text-muted);
-    margin-top: 2px;
-    text-align: center;
-    width: 100%;
-    opacity: 0.7;
+  font-size: 0.6rem;
+  color: var(--color-text-muted);
+  margin-top: 2px;
+  text-align: center;
+  width: 100%;
+  opacity: 0.7;
 }
 
 .app-main {
-    padding-bottom: 120px;
+  padding-bottom: 120px;
 }
 
 /* ============================================
    Data Update Time
    ============================================ */
 .data-update-time {
-    text-align: center;
-    font-size: var(--font-size-xs);
-    color: var(--color-text-secondary);
-    padding: var(--spacing-sm);
-    background-color: var(--color-bg-secondary);
-    border-bottom: 1px solid var(--border-color);
-    margin-bottom: var(--spacing-sm);
+  text-align: center;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  padding: var(--spacing-sm);
+  background-color: var(--color-bg-secondary);
+  border-bottom: 1px solid var(--border-color);
+  margin-bottom: var(--spacing-sm);
+}
+
+/* ============================================
+   Chart Date
+   ============================================ */
+.chart-date {
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
+  margin-left: 8px;
+  font-weight: normal;
 }

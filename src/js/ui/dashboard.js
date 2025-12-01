@@ -361,14 +361,22 @@ export class Dashboard {
     const dateTextDep = document.getElementById('current-date-dep');
     const terminalInfoDep = document.getElementById('terminal-info-dep');
 
-    if (dateText || dateTextDep) {
+    // Chart Title Dates
+    const chartDateArrival = document.getElementById('chart-date-arrival');
+    const chartDateDeparture = document.getElementById('chart-date-departure');
+
+    if (requirement.date) {
       const date = new Date(requirement.date);
       const days = ['일', '월', '화', '수', '목', '금', '토'];
       const dayName = days[date.getDay()];
       const text = `${requirement.date} (${dayName})`;
+      const simpleDate = requirement.date; // e.g. 2025.12.01
 
       if (dateText) dateText.textContent = text;
       if (dateTextDep) dateTextDep.textContent = text;
+
+      if (chartDateArrival) chartDateArrival.textContent = simpleDate;
+      if (chartDateDeparture) chartDateDeparture.textContent = simpleDate;
     }
 
     if (terminalInfo) terminalInfo.textContent = '제1여객터미널';
