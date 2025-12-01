@@ -624,7 +624,8 @@ export class Dashboard {
     const saveBtn = document.getElementById('btn-save-settings');
     if (saveBtn) {
       saveBtn.addEventListener('click', () => {
-        this.settingsUI.saveFromView();
+        const currentSettings = window.iqmApp?.state?.settings;
+        this.settingsUI.saveFromView(currentSettings);
         alert('설정이 저장되었습니다.');
       });
     }

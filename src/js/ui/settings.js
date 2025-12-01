@@ -14,7 +14,7 @@ export class SettingsUI {
    * 설정 저장
    * @param {Object} currentSettings 
    */
-  saveFromView() {
+  saveFromView(currentSettings = DefaultSettings) {
     console.log('SettingsUI: saveFromView called');
     const arrKorean = document.getElementById('setting-arr-korean');
     const arrForeign = document.getElementById('setting-arr-foreign');
@@ -24,15 +24,15 @@ export class SettingsUI {
     const darkmode = document.getElementById('setting-darkmode');
 
     const newSettings = {
-      ...DefaultSettings,
-      targetWaitTime: arrKorean ? Number(waitTime.value) : 15,
-      targetUtilization: utilization ? Number(utilization.value) / 100 : 0.85,
-      autoGateRatio: autogate ? Number(autogate.value) / 100 : 0.3,
+      ...currentSettings,
+      targetWaitTime: arrKorean ? Number(waitTime.value) : currentSettings.targetWaitTime,
+      targetUtilization: utilization ? Number(utilization.value) / 100 : currentSettings.targetUtilization,
+      autoGateRatio: autogate ? Number(autogate.value) / 100 : currentSettings.autoGateRatio,
       theme: darkmode?.checked ? 'dark' : 'light',
       serviceRates: {
-        ...DefaultSettings.serviceRates,
-        arrivalKorean: arrKorean ? Number(arrKorean.value) : 60,
-        arrivalForeign: arrForeign ? Number(arrForeign.value) : 40
+        ...currentSettings.serviceRates,
+        arrivalKorean: arrKorean ? Number(arrKorean.value) : currentSettings.serviceRates.arrivalKorean,
+        arrivalForeign: arrForeign ? Number(arrForeign.value) : currentSettings.serviceRates.arrivalForeign
       }
     };
 
