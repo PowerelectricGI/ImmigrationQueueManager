@@ -1,0 +1,337 @@
+/**
+ * src/js/data/parkingFetch.js
+ * 인천공항 주차장 현황 데이터 가져오기
+ */
+
+import { generateUUID } from '../utils/helpers.js';
+
+/**
+ * 주차장 데이터 Fetcher
+ */
+export class ParkingDataFetcher {
+    // CORS 프록시 목록
+    static CORS_PROXIES = [
+        {
+            name: 'AllOrigins',
+            url: 'https://api.allorigins.win/raw?url=',
+            enabled: true
+        },
+        {
+            name: 'Corsproxy.io',
+            url: 'https://corsproxy.io/?',
+            enabled: true
+        }
+    ];
+
+    // 주차장 URL
+    static PARKING_URLS = {
+        shortTerm: 'https://www.airport.kr/ap_ko/964/subview.do', // 단기주차장
+        longTerm: 'https://www.airport.kr/ap_ko/965/subview.do'   // 장기주차장
+    };
+
+    /**
+     * XPath로 요소 찾기 (브라우저 환경)
+     * @param {Document} doc - DOM Document
+     * @param {string} xpath - XPath 문자열
+     * @returns {string|null} 텍스트 내용
+     */
+    static getTextByXPath(doc, xpath) {
+        try {
+            const result = doc.evaluate(xpath, doc, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null);
+            if (result.singleNodeValue) {
+                return result.singleNodeValue.textContent.trim();
+            }
+        } catch (e) {
+            console.warn('XPath evaluation failed:', xpath, e);
+        }
+        return null;
+    }
+
+    /**
+     * CSS 선택자로 요소 찾기 (XPath 대체)
+     * @param {Document} doc - DOM Document
+     * @param {string} selector - CSS 선택자
+     * @returns {string|null} 텍스트 내용
+     */
+    static getTextBySelector(doc, selector) {
+        try {
+            const element = doc.querySelector(selector);
+            if (element) {
+                return element.textContent.trim();
+            }
+        } catch (e) {
+            console.warn('Selector failed:', selector, e);
+        }
+        return null;
+    }
+
+    /**
+     * 숫자 추출
+     * @param {string} text - 텍스트
+     * @returns {number} 숫자 (없으면 0)
+     */
+    static extractNumber(text) {
+        if (!text) return 0;
+        const match = text.replace(/,/g, '').match(/\d+/);
+        return match ? parseInt(match[0], 10) : 0;
+    }
+
+    /**
+     * 단기주차장 HTML 파싱
+     * XPath 기반:
+     * - 지상 1층: //*[@id="menu964_obj1181"]/div/div[4]/ul/li[1]/div/div[2]/div[1]
+     * - 지하 1층: //*[@id="menu964_obj1181"]/div/div[4]/ul/li[2]/div/div[2]/div[1]
+     * - 지하 2층: //*[@id="menu964_obj1181"]/div/div[4]/ul/li[3]/div/div[2]/div[1]
+     * 
+     * @param {string} html - HTML 문자열
+     * @returns {Object} 단기주차장 데이터
+     */
+    /**
+     * 단기주차장 HTML 파싱 (Label Matching)
+     * @param {string} html - HTML 문자열
+     * @returns {Object} 단기주차장 데이터
+     */
+    static parseShortTermHTML(html) {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+
+        const result = {
+            floor1: { available: 0, name: '지상 1층' },
+            basement1: { available: 0, name: '지하 1층' },
+            basement2: { available: 0, name: '지하 2층' }
+        };
+
+        try {
+            const container = doc.querySelector('#menu964_obj1181');
+            if (!container) throw new Error('Short term container not found');
+
+            const items = container.querySelectorAll('ul > li');
+            items.forEach(item => {
+                const labelEl = item.querySelector('.num-txt');
+                const valEl = item.querySelector('.num-noti strong');
+
+                if (labelEl && valEl) {
+                    const label = labelEl.textContent.trim();
+                    const val = this.extractNumber(valEl.textContent);
+
+                    if (label.includes('지상 1층')) result.floor1.available = val;
+                    else if (label.includes('지하 1층')) result.basement1.available = val;
+                    else if (label.includes('지하 2층')) result.basement2.available = val;
+                }
+            });
+
+            console.log('단기주차장 파싱 결과:', result);
+        } catch (error) {
+            console.error('단기주차장 파싱 오류:', error);
+        }
+
+        return result;
+    }
+
+    /**
+     * 장기주차장 HTML 파싱 (Label Matching)
+     * @param {string} html - HTML 문자열
+     * @returns {Object} 장기주차장 데이터
+     */
+    static parseLongTermHTML(html) {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+
+        const result = {
+            east: {
+                p1: { available: 0, name: '장기주차장 P1' },
+                tower: { available: 0, name: '주차타워 동편' },
+                p3: { available: 0, name: '장기주차장 P3' }
+            },
+            west: {
+                p2: { available: 0, name: '장기주차장 P2' },
+                tower: { available: 0, name: '주차타워 서편' },
+                p4: { available: 0, name: '장기주차장 P4' }
+            }
+        };
+
+        try {
+            const container = doc.querySelector('#menu965_obj1182');
+            if (!container) throw new Error('Long term container not found');
+
+            // Find all ULs to distinguish East vs West sections
+            const uls = container.querySelectorAll('ul');
+
+            uls.forEach(ul => {
+                const items = ul.querySelectorAll('li');
+                let isEast = false;
+                let isWest = false;
+
+                // 1. Detect Section based on labels present
+                items.forEach(item => {
+                    const labelEl = item.querySelector('.num-txt');
+                    if (labelEl) {
+                        const txt = labelEl.textContent;
+                        if (txt.includes('P1') || txt.includes('P3')) isEast = true;
+                        if (txt.includes('P2') || txt.includes('P4')) isWest = true;
+                    }
+                });
+
+                // 2. Extract Data
+                items.forEach(item => {
+                    const labelEl = item.querySelector('.num-txt');
+                    const valEl = item.querySelector('.num-noti strong');
+
+                    if (labelEl && valEl) {
+                        const label = labelEl.textContent.trim();
+                        const val = this.extractNumber(valEl.textContent);
+
+                        if (isEast) {
+                            if (label.includes('P1')) result.east.p1.available = val;
+                            else if (label.includes('P3')) result.east.p3.available = val;
+                            else if (label.includes('주차타워')) result.east.tower.available = val;
+                        } else if (isWest) {
+                            if (label.includes('P2')) result.west.p2.available = val;
+                            else if (label.includes('P4')) result.west.p4.available = val;
+                            else if (label.includes('주차타워')) result.west.tower.available = val;
+                        }
+                    }
+                });
+            });
+
+            console.log('장기주차장 파싱 결과:', result);
+        } catch (error) {
+            console.error('장기주차장 파싱 오류:', error);
+        }
+
+        return result;
+    }
+
+    /**
+     * CORS 프록시를 통해 HTML 가져오기
+     * @param {string} url - 대상 URL
+     * @returns {Promise<string>} HTML 문자열
+     */
+    static async fetchWithProxy(url) {
+        const enabledProxies = this.CORS_PROXIES.filter(p => p.enabled);
+        const timestamp = new Date().getTime(); // Cache buster
+
+        for (const proxy of enabledProxies) {
+            // Append timestamp to the original URL or the proxy URL to ensure uniqueness
+            const separator = url.includes('?') ? '&' : '?';
+            const urlWithCacheBuster = `${url}${separator}_t=${timestamp}`;
+
+            const proxyUrl = proxy.url + encodeURIComponent(urlWithCacheBuster);
+            console.log(`Fetching parking data via ${proxy.name}: ${proxyUrl}`);
+
+            try {
+                const response = await fetch(proxyUrl, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+                        'Cache-Control': 'no-cache',
+                        'Pragma': 'no-cache'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+
+                const html = await response.text();
+
+                if (html.length < 500) {
+                    throw new Error('Response too short');
+                }
+
+                return html;
+
+            } catch (error) {
+                console.warn(`${proxy.name} 실패:`, error.message);
+                continue;
+            }
+        }
+
+        throw new Error('모든 프록시 실패');
+    }
+
+    /**
+     * 주차장 데이터 가져오기 메인 함수
+     * @returns {Promise<Object>} 주차장 데이터
+     */
+    static async fetchParkingData() {
+        const result = {
+            id: generateUUID(),
+            lastUpdated: new Date().toISOString(),
+            shortTerm: null,
+            longTerm: null,
+            errors: []
+        };
+
+        // 단기주차장 데이터 가져오기
+        try {
+            const shortTermHtml = await this.fetchWithProxy(this.PARKING_URLS.shortTerm);
+            result.shortTerm = this.parseShortTermHTML(shortTermHtml);
+            console.log('단기주차장 데이터:', result.shortTerm);
+        } catch (error) {
+            console.error('단기주차장 데이터 가져오기 실패:', error);
+            result.errors.push(`단기주차장: ${error.message}`);
+            // 기본값 설정
+            result.shortTerm = {
+                floor1: { available: 0, name: '지상 1층' },
+                basement1: { available: 0, name: '지하 1층' },
+                basement2: { available: 0, name: '지하 2층' }
+            };
+        }
+
+        // 장기주차장 데이터 가져오기
+        try {
+            const longTermHtml = await this.fetchWithProxy(this.PARKING_URLS.longTerm);
+            result.longTerm = this.parseLongTermHTML(longTermHtml);
+            console.log('장기주차장 데이터:', result.longTerm);
+        } catch (error) {
+            console.error('장기주차장 데이터 가져오기 실패:', error);
+            result.errors.push(`장기주차장: ${error.message}`);
+            // 기본값 설정
+            result.longTerm = {
+                east: {
+                    p1: { available: 0, name: '장기주차장 P1' },
+                    tower: { available: 0, name: '주차타워 동편' },
+                    p3: { available: 0, name: '장기주차장 P3' }
+                },
+                west: {
+                    p2: { available: 0, name: '장기주차장 P2' },
+                    tower: { available: 0, name: '주차타워 서편' },
+                    p4: { available: 0, name: '장기주차장 P4' }
+                }
+            };
+        }
+
+        return result;
+    }
+
+    /**
+     * 샘플 데이터 (테스트/폴백용)
+     * @returns {Object} 샘플 주차장 데이터
+     */
+    static getSampleData() {
+        return {
+            id: generateUUID(),
+            lastUpdated: new Date().toISOString(),
+            shortTerm: {
+                floor1: { available: 245, name: '지상 1층' },
+                basement1: { available: 189, name: '지하 1층' },
+                basement2: { available: 312, name: '지하 2층' }
+            },
+            longTerm: {
+                east: {
+                    p1: { available: 523, name: '장기주차장 P1' },
+                    tower: { available: 156, name: '주차타워 동편' },
+                    p3: { available: 789, name: '장기주차장 P3' }
+                },
+                west: {
+                    p2: { available: 445, name: '장기주차장 P2' },
+                    tower: { available: 201, name: '주차타워 서편' },
+                    p4: { available: 612, name: '장기주차장 P4' }
+                }
+            },
+            errors: [],
+            isSample: true
+        };
+    }
+}

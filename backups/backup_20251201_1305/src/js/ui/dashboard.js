@@ -205,20 +205,6 @@ export class Dashboard {
 
     this.requirement = requirement;
 
-    // Update Last Updated Time
-    if (requirement.lastUpdated) {
-      const date = new Date(requirement.lastUpdated);
-      const options = { month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true };
-      const timeString = date.toLocaleString('ko-KR', options);
-      const updateText = `마지막 업데이트: ${timeString}`;
-
-      const arrivalTimeEl = document.getElementById('arrival-update-time');
-      const departureTimeEl = document.getElementById('departure-update-time');
-
-      if (arrivalTimeEl) arrivalTimeEl.textContent = updateText;
-      if (departureTimeEl) departureTimeEl.textContent = updateText;
-    }
-
     this.renderDateInfo(requirement);
     this.renderPeakAlert(requirement);
     this.renderChart(requirement);

@@ -178,7 +178,6 @@ export function calculateAllRequirements(forecast, settings) {
         id: generateUUID(),
         forecastId: forecast.id,
         date: forecast.date,
-        lastUpdated: forecast.lastUpdated, // Pass through lastUpdated
         calculatedAt: new Date().toISOString(),
         parameters: { ...settings }, // 설정 스냅샷
         hourlyRequirement,
