@@ -323,7 +323,8 @@ export class Dashboard {
     }
 
     if (zoneList) {
-      zoneList.innerHTML = ZoneCardList(currentData.arrival, 'arrival');
+      const headerHtml = `<div style="font-size: 0.9rem; color: var(--color-text-secondary); margin-bottom: 0.5rem; text-align: right;">현재 시간 승객수 (클릭하면 전체 시간)</div>`;
+      zoneList.innerHTML = headerHtml + ZoneCardList(currentData.arrival, 'arrival');
     }
 
     if (assignmentContainer) {
@@ -397,7 +398,8 @@ export class Dashboard {
     }
 
     if (zoneList) {
-      zoneList.innerHTML = ZoneCardList(currentData.departure, 'departure');
+      const headerHtml = `<div style="font-size: 0.9rem; color: var(--color-text-secondary); margin-bottom: 0.5rem; text-align: right;">현재 시간 승객수 (클릭하면 전체 시간)</div>`;
+      zoneList.innerHTML = headerHtml + ZoneCardList(currentData.departure, 'departure');
 
       // Add Booth Assignment Containers
       const zones = ['AB', 'C', 'D', 'EF'];
