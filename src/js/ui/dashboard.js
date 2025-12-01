@@ -214,9 +214,11 @@ export class Dashboard {
 
       const arrivalTimeEl = document.getElementById('arrival-update-time');
       const departureTimeEl = document.getElementById('departure-update-time');
+      const dataTimeEl = document.getElementById('data-update-time');
 
       if (arrivalTimeEl) arrivalTimeEl.textContent = updateText;
       if (departureTimeEl) departureTimeEl.textContent = updateText;
+      if (dataTimeEl) dataTimeEl.textContent = updateText;
     }
 
     this.renderDateInfo(requirement);
