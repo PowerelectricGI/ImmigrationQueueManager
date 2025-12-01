@@ -154,8 +154,20 @@ class App {
         (updatedSettings) => {
           console.log('Realtime update: Settings');
           this.state.settings = updatedSettings;
-          this.eventBus.emit('settings:changed', updatedSettings);
+          // Do NOT emit 'settings:changed' to avoid infinite save loop
+          // this.eventBus.emit('settings:changed', updatedSettings);
+
           localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(updatedSettings));
+
+          // Update UI directly
+          if (this.state.forecast) {
+            this.recalculate();
+          }
+
+          // If Settings UI is active, we might want to refresh it, 
+          // but for now, recalculating the dashboard is the most important part.
+          // Ideally, SettingsUI should subscribe to a 'settings:updated_remote' event if we wanted to be perfect,
+          // but this fixes the critical bug.
         },
         (status) => {
           console.log('Subscription Status:', status);
