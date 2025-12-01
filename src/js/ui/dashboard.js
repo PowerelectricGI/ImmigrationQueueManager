@@ -630,33 +630,38 @@ export class Dashboard {
       });
     }
   }
+
   /**
    * 수동 입력 테이블 업데이트
    */
   updateManualInputTable(requirement) {
-    if (!requirement || !requirement.hourlyRequirement) return;
+    if (!requirement || !requirement.hourlyRequirement) {
+      console.warn('updateManualInputTable: No requirement data');
+      return;
+    }
 
     const tbody = document.getElementById('manual-input-body');
+    console.log('updateManualInputTable: tbody found?', !!tbody, 'children:', tbody?.children?.length);
+
     if (!tbody || tbody.children.length === 0) {
+      console.log('updateManualInputTable: Generating table...');
       generateManualInputTable();
     }
 
     requirement.hourlyRequirement.forEach(data => {
       const hour = data.hourStart;
-      const arrInput = document.getElementById(`arr - ${hour} `);
-      const depInput = document.getElementById(`dep - ${hour} `);
+      const arrInput = document.getElementById(`arr-${hour}`);
+      const depInput = document.getElementById(`dep-${hour}`);
 
       if (arrInput && depInput) {
         // Use explicit totals from calculator (which prefers source total)
         arrInput.value = data.arrivalPassengers || 0;
         depInput.value = data.departurePassengers || 0;
+      } else {
+        console.warn(`updateManualInputTable: Inputs not found for hour ${hour}`);
       }
     });
   }
-
-  /**
-   * Staff List Update
-   */
   updateStaffList(staffList) {
     this.staffList = staffList;
     // Re-render current view to reflect staff changes
