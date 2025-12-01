@@ -66,11 +66,11 @@ export const Storage = {
             } else if (key === STORAGE_KEYS.SETTINGS) {
                 const { error } = await supabase
                     .from('settings')
-                    .upsert({
+                    .upsert([{
                         id: 'global_settings',
                         config: data,
                         updated_at: new Date().toISOString()
-                    });
+                    }]);
 
                 if (error) throw error;
             }
