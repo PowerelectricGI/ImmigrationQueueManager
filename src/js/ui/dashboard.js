@@ -575,7 +575,7 @@ export class Dashboard {
     const settingsView = document.getElementById('view-settings');
     if (!settingsView) return;
 
-    // 현재 설정 가져오기 (app에서 전달받아야 함)
+    // 현재 설정 가져오기
     const settings = window.iqmApp?.state?.settings || {};
 
     settingsView.innerHTML = `
@@ -642,8 +642,8 @@ export class Dashboard {
 
     requirement.hourlyRequirement.forEach(data => {
       const hour = data.hourStart;
-      const arrInput = document.getElementById(`arr-${hour}`);
-      const depInput = document.getElementById(`dep-${hour}`);
+      const arrInput = document.getElementById(`arr - ${hour} `);
+      const depInput = document.getElementById(`dep - ${hour} `);
 
       if (arrInput && depInput) {
         // Use explicit totals from calculator (which prefers source total)
@@ -671,7 +671,6 @@ export class Dashboard {
    */
   renderBoothAssignment(containerId, type, zone) {
     const container = document.getElementById(containerId);
-    console.log(`renderBoothAssignment: ${containerId}, type=${type}, zone=${zone}, container=${!!container}`);
     if (!container) return;
 
     const boothCount = 10; // Fixed 10 booths
@@ -785,7 +784,7 @@ export class Dashboard {
           </div>
         </div>
       </div>
-    `;
+      `;
 
     modalContainer.innerHTML = modalHTML;
 
@@ -809,33 +808,21 @@ export class Dashboard {
     if (unassignBtn) {
       unassignBtn.addEventListener('click', (e) => {
         e.stopPropagation();
-        // Direct unassign without native confirm (can be improved with custom UI later)
         if (assignedStaff && assignedStaff.id) {
           this.eventBus.emit('staff:unassign', { staffId: assignedStaff.id });
           closeModal();
-        } else {
-          console.error('No staff ID found for unassignment');
         }
       });
     }
 
-    // Staff Selection Events (Assignment/Replacement)
+    // Staff Selection Events
     const staffBtns = modalContainer.querySelectorAll('.staff-select-btn');
     staffBtns.forEach(btn => {
       btn.addEventListener('click', () => {
         const staffId = btn.dataset.id;
-        // If replacing, we might want to unassign the old one first, 
-        // but our app.js logic might handle it or we can just overwrite.
-        // Ideally, the backend/logic handles "if booth occupied, unassign old, assign new".
-        // For now, let's just emit assign. If the system supports overwriting, it works.
-        // If not, we might need to emit unassign for old one first.
-        // Let's assume overwrite is fine or add unassign logic here if needed.
-
         if (assignedStaff) {
-          // Optional: Explicitly unassign old staff to set them to IDLE
           app.eventBus.emit('staff:unassign', { staffId: assignedStaff.id });
         }
-
         app.eventBus.emit('staff:assign', {
           staffId: staffId,
           type: type,
