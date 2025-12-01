@@ -121,7 +121,7 @@ class App {
       // 6. 실시간 구독 시작
       const statusIndicator = document.createElement('div');
       statusIndicator.id = 'sync-status';
-      statusIndicator.style.cssText = 'position: fixed; bottom: 100px; right: 10px; padding: 5px 10px; background: rgba(0,0,0,0.7); color: white; border-radius: 20px; font-size: 12px; z-index: 9999; display: flex; align-items: center; gap: 5px;';
+      statusIndicator.style.cssText = 'position: fixed; bottom: 100px; right: 10px; padding: 5px 10px; background: rgba(0,0,0,0.7); color: white; border-radius: 20px; font-size: 12px; z-index: 5000; display: flex; align-items: center; gap: 5px;';
       statusIndicator.innerHTML = '<span style="width: 8px; height: 8px; background: #fbbf24; border-radius: 50%;"></span> Connecting...';
       document.body.appendChild(statusIndicator);
 
