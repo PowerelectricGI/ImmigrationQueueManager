@@ -790,17 +790,6 @@ input[type="range"]::-moz-range-thumb {
   color: var(--color-success);
 }
 
-.text-warning {
-  color: var(--color-alert-yellow);
-}
-
-.text-danger {
-  color: var(--color-alert-red);
-}
-
-/* ============================================
-   Scrollbar Styling
-   ============================================ */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
