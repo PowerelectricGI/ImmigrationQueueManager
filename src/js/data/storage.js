@@ -78,7 +78,8 @@ export const Storage = {
             return true;
         } catch (error) {
             console.error('Supabase save failed:', error);
-            alert(`클라우드 저장 실패: ${error.message || JSON.stringify(error)}`);
+            // Local save already happened at the beginning of the function
+            alert(`로컬에는 저장되었으나 클라우드 동기화에 실패했습니다.\n오류: ${error.message || JSON.stringify(error)}`);
             return false;
         }
     },
