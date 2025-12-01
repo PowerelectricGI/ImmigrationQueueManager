@@ -15,6 +15,7 @@ export class Dashboard {
     this.currentHour = new Date().getHours();
     this.requirement = null;
     this.settingsUI = new SettingsUI(eventBus);
+    this.modalChart = null;
   }
 
   /**
@@ -116,12 +117,15 @@ export class Dashboard {
 
     const modalHTML = `
       <div class="modal-overlay" id="zone-modal-overlay">
-        <div class="modal-content" style="max-width: 500px;">
+        <div class="modal-content" style="max-width: 600px;">
           <div class="modal-header">
             <div class="modal-title">${title}</div>
             <div class="modal-close" id="modal-close-btn">×</div>
           </div>
-          <div class="modal-body" style="max-height: 60vh; overflow-y: auto;">
+          <div class="modal-body" style="max-height: 80vh; overflow-y: auto;">
+            <div class="chart-container" style="height: 200px; margin-bottom: 1rem;">
+              <canvas id="modal-chart"></canvas>
+            </div>
             <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem;">
               <thead>
                 <tr style="background: rgba(255,255,255,0.05);">
@@ -141,11 +145,15 @@ export class Dashboard {
 
     modalContainer.innerHTML = modalHTML;
 
+    // Render Chart
+    this.renderModalChart(type, hourlyData);
+
     // Bind Close Events
     const overlay = document.getElementById('zone-modal-overlay');
     const closeBtn = document.getElementById('modal-close-btn');
 
     const closeModal = () => {
+      this.destroyModalChart();
       modalContainer.innerHTML = '';
     };
 
@@ -154,6 +162,116 @@ export class Dashboard {
       overlay.addEventListener('click', (e) => {
         if (e.target === overlay) closeModal();
       });
+    }
+  }
+
+  /**
+   * Render Modal Chart
+   */
+  renderModalChart(type, hourlyData) {
+    const canvas = document.getElementById('modal-chart');
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    const labels = hourlyData.map(d => d.hour);
+    const passengerData = hourlyData.map(d => d.passengers);
+    const staffData = hourlyData.map(d => d.required);
+
+    const getColor = (value) => {
+      if (type === 'arrival') {
+        if (value < 1000) return 'rgba(34, 197, 94, 0.8)'; // Green
+        if (value < 2500) return 'rgba(234, 179, 8, 0.8)'; // Yellow
+        if (value < 4000) return 'rgba(249, 115, 22, 0.8)'; // Orange
+        return 'rgba(239, 68, 68, 0.8)'; // Red
+      } else {
+        if (value < 1000) return 'rgba(56, 189, 248, 0.8)'; // Light Blue
+        if (value < 2500) return 'rgba(37, 99, 235, 0.8)'; // Blue
+        if (value < 4000) return 'rgba(79, 70, 229, 0.8)'; // Indigo
+        return 'rgba(147, 51, 234, 0.8)'; // Purple
+      }
+    };
+
+    this.modalChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: labels,
+        datasets: [
+          {
+            label: '승객 수',
+            data: passengerData,
+            backgroundColor: (context) => getColor(context.raw),
+            borderColor: (context) => getColor(context.raw).replace('0.8)', '1)'),
+            borderWidth: 1,
+            borderRadius: 4,
+            yAxisID: 'y',
+            order: 2
+          },
+          {
+            label: '필요 인원',
+            data: staffData,
+            type: 'line',
+            borderColor: '#fbbf24',
+            backgroundColor: 'transparent',
+            borderWidth: 2,
+            pointRadius: 0,
+            pointHoverRadius: 4,
+            tension: 0.3,
+            yAxisID: 'y1',
+            order: 1
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: {
+          mode: 'index',
+          intersect: false
+        },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            backgroundColor: 'rgba(22, 27, 34, 0.95)',
+            titleColor: '#e6edf3',
+            bodyColor: '#8b949e',
+            borderColor: '#30363d',
+            borderWidth: 1,
+            padding: 10,
+            cornerRadius: 8,
+            displayColors: true
+          }
+        },
+        scales: {
+          x: {
+            grid: { color: 'rgba(48, 54, 61, 0.3)', drawBorder: false },
+            ticks: { color: '#8b949e', font: { size: 10 }, maxRotation: 0, autoSkip: true, maxTicksLimit: 8 }
+          },
+          y: {
+            type: 'linear',
+            position: 'left',
+            beginAtZero: true,
+            grid: { color: 'rgba(48, 54, 61, 0.3)', drawBorder: false },
+            ticks: { color: '#8b949e', font: { size: 10 } }
+          },
+          y1: {
+            type: 'linear',
+            position: 'right',
+            beginAtZero: true,
+            grid: { drawOnChartArea: false },
+            ticks: { color: '#fbbf24', font: { size: 10 } }
+          }
+        }
+      }
+    });
+  }
+
+  /**
+   * Destroy Modal Chart
+   */
+  destroyModalChart() {
+    if (this.modalChart) {
+      this.modalChart.destroy();
+      this.modalChart = null;
     }
   }
 
