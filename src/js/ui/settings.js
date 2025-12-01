@@ -15,6 +15,7 @@ export class SettingsUI {
    * @param {Object} currentSettings 
    */
   saveFromView() {
+    console.log('SettingsUI: saveFromView called');
     const arrKorean = document.getElementById('setting-arr-korean');
     const arrForeign = document.getElementById('setting-arr-foreign');
     const waitTime = document.getElementById('setting-wait-time');
@@ -35,6 +36,7 @@ export class SettingsUI {
       }
     };
 
+    console.log('SettingsUI: Emitting settings:changed', newSettings);
     this.eventBus.emit('settings:changed', newSettings);
     return newSettings;
   }

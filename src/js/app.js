@@ -357,6 +357,7 @@ class App {
 
     // EventBus 구독
     this.eventBus.on('settings:changed', (newSettings) => {
+      console.log('App: settings:changed event received', newSettings);
       this.state.settings = newSettings;
       Storage.save(STORAGE_KEYS.SETTINGS, newSettings);
 
