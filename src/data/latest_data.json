@@ -1,7 +1,7 @@
 {
   "date": "2025-12-08",
   "terminal": "T1",
-  "lastUpdated": "2025-12-08T14:15:05.154128",
+  "lastUpdated": "2025-12-08T14:21:23.955708",
   "hourlyData": [
     {
       "hour": "00~01",
@@ -223,10 +223,10 @@
       "hour": "12~13",
       "hourStart": 12,
       "arrival": {
-        "AB": 527,
+        "AB": 528,
         "C": 782,
         "D": 530,
-        "EF": 945,
+        "EF": 944,
         "total": 2784
       },
       "departure": {
@@ -241,10 +241,10 @@
       "hour": "13~14",
       "hourStart": 13,
       "arrival": {
-        "AB": 875,
+        "AB": 874,
         "C": 459,
         "D": 218,
-        "EF": 1471,
+        "EF": 1472,
         "total": 3023
       },
       "departure": {
@@ -259,10 +259,10 @@
       "hour": "14~15",
       "hourStart": 14,
       "arrival": {
-        "AB": 1609,
+        "AB": 1610,
         "C": 427,
         "D": 429,
-        "EF": 1610,
+        "EF": 1609,
         "total": 4075
       },
       "departure": {
@@ -313,10 +313,10 @@
       "hour": "17~18",
       "hourStart": 17,
       "arrival": {
-        "AB": 1448,
+        "AB": 1449,
         "C": 254,
         "D": 405,
-        "EF": 1667,
+        "EF": 1666,
         "total": 3774
       },
       "departure": {
@@ -331,10 +331,10 @@
       "hour": "18~19",
       "hourStart": 18,
       "arrival": {
-        "AB": 1620,
+        "AB": 1621,
         "C": 68,
         "D": 60,
-        "EF": 1764,
+        "EF": 1763,
         "total": 3512
       },
       "departure": {
@@ -367,10 +367,10 @@
       "hour": "20~21",
       "hourStart": 20,
       "arrival": {
-        "AB": 1070,
+        "AB": 1073,
         "C": 808,
         "D": 495,
-        "EF": 748,
+        "EF": 745,
         "total": 3121
       },
       "departure": {
@@ -385,10 +385,10 @@
       "hour": "21~22",
       "hourStart": 21,
       "arrival": {
-        "AB": 964,
+        "AB": 965,
         "C": 412,
         "D": 412,
-        "EF": 1284,
+        "EF": 1283,
         "total": 3072
       },
       "departure": {
