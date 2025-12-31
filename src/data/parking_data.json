@@ -1,10 +1,22 @@
 {
-  "id": "20251231141417",
-  "lastUpdated": "2025-12-31T14:14:17.545149",
-  "shortTerm": null,
+  "id": "20251231151410",
+  "lastUpdated": "2025-12-31T15:14:10.472775",
+  "shortTerm": {
+    "floor1": {
+      "available": 199,
+      "name": "지상 1층"
+    },
+    "basement1": {
+      "available": 253,
+      "name": "지하 1층"
+    },
+    "basement2": {
+      "available": 77,
+      "name": "지하 2층"
+    }
+  },
   "longTerm": null,
   "errors": [
-    "Short-term: invalid literal for int() with base 10: ''",
     "Long-term: invalid literal for int() with base 10: ''"
   ]
 }
