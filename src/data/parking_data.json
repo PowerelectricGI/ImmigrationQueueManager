@@ -1,10 +1,22 @@
 {
-  "id": "20260205163754",
-  "lastUpdated": "2026-02-05T16:37:54.894444",
-  "shortTerm": null,
+  "id": "20260205174145",
+  "lastUpdated": "2026-02-05T17:41:45.920943",
+  "shortTerm": {
+    "floor1": {
+      "available": 14,
+      "name": "지상 1층"
+    },
+    "basement1": {
+      "available": 71,
+      "name": "지하 1층"
+    },
+    "basement2": {
+      "available": 211,
+      "name": "지하 2층"
+    }
+  },
   "longTerm": null,
   "errors": [
-    "Short-term: Short term container not found",
     "Long-term: Long term container not found"
   ]
 }
