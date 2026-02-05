@@ -1,49 +1,10 @@
 {
-  "id": "20260205153422",
-  "lastUpdated": "2026-02-05T15:34:22.593058",
-  "shortTerm": {
-    "floor1": {
-      "available": 34,
-      "name": "지상 1층"
-    },
-    "basement1": {
-      "available": 81,
-      "name": "지하 1층"
-    },
-    "basement2": {
-      "available": 218,
-      "name": "지하 2층"
-    }
-  },
-  "longTerm": {
-    "east": {
-      "p1": {
-        "available": 197,
-        "name": "장기주차장 P1"
-      },
-      "tower": {
-        "available": 21,
-        "name": "주차타워 동편"
-      },
-      "p3": {
-        "available": 458,
-        "name": "장기주차장 P3"
-      }
-    },
-    "west": {
-      "p2": {
-        "available": 261,
-        "name": "장기주차장 P2"
-      },
-      "tower": {
-        "available": 34,
-        "name": "주차타워 서편"
-      },
-      "p4": {
-        "available": 830,
-        "name": "장기주차장 P4"
-      }
-    }
-  },
-  "errors": []
+  "id": "20260205163754",
+  "lastUpdated": "2026-02-05T16:37:54.894444",
+  "shortTerm": null,
+  "longTerm": null,
+  "errors": [
+    "Short-term: Short term container not found",
+    "Long-term: Long term container not found"
+  ]
 }
