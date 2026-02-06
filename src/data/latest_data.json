@@ -1,17 +1,17 @@
 {
   "date": "2026-02-06",
   "terminal": "T1",
-  "lastUpdated": "2026-02-06T14:03:31.596997",
+  "lastUpdated": "2026-02-06T14:37:58.970068",
   "hourlyData": [
     {
       "hour": "00~01",
       "hourStart": 0,
       "arrival": {
-        "AB": 316,
+        "AB": 472,
         "C": 0,
         "D": 0,
         "EF": 0,
-        "total": 316
+        "total": 472
       },
       "departure": {
         "AB": 0,
@@ -97,10 +97,10 @@
       "hour": "05~06",
       "hourStart": 5,
       "arrival": {
-        "AB": 1786,
+        "AB": 1784,
         "C": 0,
         "D": 0,
-        "EF": 299,
+        "EF": 301,
         "total": 2085
       },
       "departure": {
@@ -115,10 +115,10 @@
       "hour": "06~07",
       "hourStart": 6,
       "arrival": {
-        "AB": 1720,
+        "AB": 1719,
         "C": 714,
         "D": 708,
-        "EF": 1266,
+        "EF": 1267,
         "total": 4408
       },
       "departure": {
@@ -133,10 +133,10 @@
       "hour": "07~08",
       "hourStart": 7,
       "arrival": {
-        "AB": 1025,
+        "AB": 1023,
         "C": 161,
         "D": 161,
-        "EF": 1426,
+        "EF": 1428,
         "total": 2773
       },
       "departure": {
@@ -277,10 +277,10 @@
       "hour": "15~16",
       "hourStart": 15,
       "arrival": {
-        "AB": 1456,
+        "AB": 1454,
         "C": 578,
         "D": 577,
-        "EF": 636,
+        "EF": 638,
         "total": 3247
       },
       "departure": {
@@ -295,10 +295,10 @@
       "hour": "16~17",
       "hourStart": 16,
       "arrival": {
-        "AB": 976,
+        "AB": 974,
         "C": 346,
         "D": 343,
-        "EF": 969,
+        "EF": 971,
         "total": 2634
       },
       "departure": {
@@ -331,11 +331,11 @@
       "hour": "18~19",
       "hourStart": 18,
       "arrival": {
-        "AB": 2010,
+        "AB": 2008,
         "C": 79,
         "D": 75,
-        "EF": 1064,
-        "total": 3228
+        "EF": 1065,
+        "total": 3227
       },
       "departure": {
         "AB": 1044,
@@ -367,10 +367,10 @@
       "hour": "20~21",
       "hourStart": 20,
       "arrival": {
-        "AB": 1150,
+        "AB": 1148,
         "C": 661,
         "D": 662,
-        "EF": 705,
+        "EF": 707,
         "total": 3178
       },
       "departure": {
@@ -385,10 +385,10 @@
       "hour": "21~22",
       "hourStart": 21,
       "arrival": {
-        "AB": 1544,
+        "AB": 1543,
         "C": 370,
         "D": 369,
-        "EF": 1448,
+        "EF": 1449,
         "total": 3731
       },
       "departure": {
