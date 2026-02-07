@@ -1,7 +1,7 @@
 {
   "date": "2026-02-07",
   "terminal": "T1",
-  "lastUpdated": "2026-02-07T13:42:55.593759",
+  "lastUpdated": "2026-02-07T14:19:19.012932",
   "hourlyData": [
     {
       "hour": "00~01",
@@ -97,11 +97,11 @@
       "hour": "05~06",
       "hourStart": 5,
       "arrival": {
-        "AB": 1584,
+        "AB": 1423,
         "C": 0,
         "D": 0,
-        "EF": 291,
-        "total": 1875
+        "EF": 285,
+        "total": 1708
       },
       "departure": {
         "AB": 0,
@@ -115,11 +115,11 @@
       "hour": "06~07",
       "hourStart": 6,
       "arrival": {
-        "AB": 1552,
+        "AB": 1713,
         "C": 719,
         "D": 714,
-        "EF": 908,
-        "total": 3893
+        "EF": 914,
+        "total": 4060
       },
       "departure": {
         "AB": 1189,
