@@ -1,17 +1,17 @@
 {
   "date": "2026-02-17",
   "terminal": "T1",
-  "lastUpdated": "2026-02-17T14:02:09.831670",
+  "lastUpdated": "2026-02-17T14:43:20.897677",
   "hourlyData": [
     {
       "hour": "00~01",
       "hourStart": 0,
       "arrival": {
-        "AB": 539,
+        "AB": 720,
         "C": 0,
         "D": 0,
         "EF": 0,
-        "total": 539
+        "total": 720
       },
       "departure": {
         "AB": 0,
