@@ -1,33 +1,33 @@
 {
-  "id": "20260224074459",
-  "lastUpdated": "2026-02-24T07:44:59.443052",
+  "id": "20260224083716",
+  "lastUpdated": "2026-02-24T08:37:16.423248",
   "shortTerm": null,
   "longTerm": {
     "east": {
       "p1": {
-        "available": 386,
+        "available": 397,
         "name": "장기주차장 P1"
       },
       "tower": {
-        "available": 5,
+        "available": 4,
         "name": "주차타워 동편"
       },
       "p3": {
-        "available": 842,
+        "available": 854,
         "name": "장기주차장 P3"
       }
     },
     "west": {
       "p2": {
-        "available": 691,
+        "available": 688,
         "name": "장기주차장 P2"
       },
       "tower": {
-        "available": 11,
+        "available": 6,
         "name": "주차타워 서편"
       },
       "p4": {
-        "available": 1147,
+        "available": 1140,
         "name": "장기주차장 P4"
       }
     }
