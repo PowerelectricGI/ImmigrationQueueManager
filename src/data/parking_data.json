@@ -1,49 +1,22 @@
 {
-  "id": "20260302212533",
-  "lastUpdated": "2026-03-02T21:25:33.199251",
+  "id": "20260302222028",
+  "lastUpdated": "2026-03-02T22:20:28.308308",
   "shortTerm": {
     "floor1": {
-      "available": 55,
+      "available": 10,
       "name": "지상 1층"
     },
     "basement1": {
-      "available": 81,
+      "available": 71,
       "name": "지하 1층"
     },
     "basement2": {
-      "available": 622,
+      "available": 596,
       "name": "지하 2층"
     }
   },
-  "longTerm": {
-    "east": {
-      "p1": {
-        "available": 692,
-        "name": "장기주차장 P1"
-      },
-      "tower": {
-        "available": 2,
-        "name": "주차타워 동편"
-      },
-      "p3": {
-        "available": 637,
-        "name": "장기주차장 P3"
-      }
-    },
-    "west": {
-      "p2": {
-        "available": 1019,
-        "name": "장기주차장 P2"
-      },
-      "tower": {
-        "available": 25,
-        "name": "주차타워 서편"
-      },
-      "p4": {
-        "available": 584,
-        "name": "장기주차장 P4"
-      }
-    }
-  },
-  "errors": []
+  "longTerm": null,
+  "errors": [
+    "Long-term: invalid literal for int() with base 10: ''"
+  ]
 }
