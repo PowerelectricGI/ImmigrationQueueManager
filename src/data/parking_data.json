@@ -1,46 +1,46 @@
 {
-  "id": "20260412193357",
-  "lastUpdated": "2026-04-12T19:33:57.496715",
+  "id": "20260412202712",
+  "lastUpdated": "2026-04-12T20:27:12.417376",
   "shortTerm": {
     "floor1": {
-      "available": 625,
+      "available": 595,
       "name": "지상 1층"
     },
     "basement1": {
-      "available": 159,
+      "available": 143,
       "name": "지하 1층"
     },
     "basement2": {
-      "available": 783,
+      "available": 768,
       "name": "지하 2층"
     }
   },
   "longTerm": {
     "east": {
       "p1": {
-        "available": 729,
+        "available": 582,
         "name": "장기주차장 P1"
       },
       "tower": {
-        "available": 64,
+        "available": 22,
         "name": "주차타워 동편"
       },
       "p3": {
-        "available": 1273,
+        "available": 1268,
         "name": "장기주차장 P3"
       }
     },
     "west": {
       "p2": {
-        "available": 1100,
+        "available": 1039,
         "name": "장기주차장 P2"
       },
       "tower": {
-        "available": 66,
+        "available": 43,
         "name": "주차타워 서편"
       },
       "p4": {
-        "available": 1477,
+        "available": 1479,
         "name": "장기주차장 P4"
       }
     }
