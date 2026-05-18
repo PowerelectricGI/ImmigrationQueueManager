@@ -1,22 +1,49 @@
 {
-  "id": "20260518023531",
-  "lastUpdated": "2026-05-18T02:35:31.463758",
+  "id": "20260518064816",
+  "lastUpdated": "2026-05-18T06:48:16.175835",
   "shortTerm": {
     "floor1": {
-      "available": 484,
+      "available": 463,
       "name": "지상 1층"
     },
     "basement1": {
-      "available": 94,
+      "available": 95,
       "name": "지하 1층"
     },
     "basement2": {
-      "available": 699,
+      "available": 676,
       "name": "지하 2층"
     }
   },
-  "longTerm": null,
-  "errors": [
-    "Long-term: invalid literal for int() with base 10: ''"
-  ]
+  "longTerm": {
+    "east": {
+      "p1": {
+        "available": 392,
+        "name": "장기주차장 P1"
+      },
+      "tower": {
+        "available": 26,
+        "name": "주차타워 동편"
+      },
+      "p3": {
+        "available": 1133,
+        "name": "장기주차장 P3"
+      }
+    },
+    "west": {
+      "p2": {
+        "available": 782,
+        "name": "장기주차장 P2"
+      },
+      "tower": {
+        "available": 12,
+        "name": "주차타워 서편"
+      },
+      "p4": {
+        "available": 1460,
+        "name": "장기주차장 P4"
+      }
+    }
+  },
+  "errors": []
 }
