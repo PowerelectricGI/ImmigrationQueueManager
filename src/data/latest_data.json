@@ -1,17 +1,17 @@
 {
   "date": "2026-06-01",
   "terminal": "T1",
-  "lastUpdated": "2026-06-01T04:27:21.850072",
+  "lastUpdated": "2026-06-01T09:29:11.159941",
   "hourlyData": [
     {
       "hour": "00~01",
       "hourStart": 0,
       "arrival": {
-        "AB": 126,
-        "C": 442,
+        "AB": 22,
+        "C": 388,
         "D": 0,
         "EF": 0,
-        "total": 568
+        "total": 410
       },
       "departure": {
         "AB": 0,
@@ -25,18 +25,18 @@
       "hour": "01~02",
       "hourStart": 1,
       "arrival": {
-        "AB": 27,
-        "C": 237,
+        "AB": 50,
+        "C": 232,
         "D": 0,
         "EF": 0,
-        "total": 264
+        "total": 282
       },
       "departure": {
         "AB": 0,
-        "C": 155,
+        "C": 177,
         "D": 0,
         "EF": 0,
-        "total": 155
+        "total": 177
       }
     },
     {
@@ -44,388 +44,10 @@
       "hourStart": 2,
       "arrival": {
         "AB": 0,
-        "C": 64,
+        "C": 88,
         "D": 0,
         "EF": 0,
-        "total": 64
-      },
-      "departure": {
-        "AB": 0,
-        "C": 134,
-        "D": 0,
-        "EF": 0,
-        "total": 134
-      }
-    },
-    {
-      "hour": "03~04",
-      "hourStart": 3,
-      "arrival": {
-        "AB": 56,
-        "C": 16,
-        "D": 0,
-        "EF": 0,
-        "total": 72
-      },
-      "departure": {
-        "AB": 0,
-        "C": 75,
-        "D": 0,
-        "EF": 0,
-        "total": 75
-      }
-    },
-    {
-      "hour": "04~05",
-      "hourStart": 4,
-      "arrival": {
-        "AB": 212,
-        "C": 136,
-        "D": 0,
-        "EF": 0,
-        "total": 348
-      },
-      "departure": {
-        "AB": 0,
-        "C": 910,
-        "D": 0,
-        "EF": 0,
-        "total": 910
-      }
-    },
-    {
-      "hour": "05~06",
-      "hourStart": 5,
-      "arrival": {
-        "AB": 673,
-        "C": 698,
-        "D": 0,
-        "EF": 0,
-        "total": 1371
-      },
-      "departure": {
-        "AB": 0,
-        "C": 1896,
-        "D": 0,
-        "EF": 87,
-        "total": 1983
-      }
-    },
-    {
-      "hour": "06~07",
-      "hourStart": 6,
-      "arrival": {
-        "AB": 835,
-        "C": 274,
-        "D": 598,
-        "EF": 0,
-        "total": 1707
-      },
-      "departure": {
-        "AB": 672,
-        "C": 1032,
-        "D": 393,
-        "EF": 111,
-        "total": 2208
-      }
-    },
-    {
-      "hour": "07~08",
-      "hourStart": 7,
-      "arrival": {
-        "AB": 1024,
-        "C": 364,
-        "D": 364,
-        "EF": 692,
-        "total": 2444
-      },
-      "departure": {
-        "AB": 1162,
-        "C": 998,
-        "D": 963,
-        "EF": 153,
-        "total": 3276
-      }
-    },
-    {
-      "hour": "08~09",
-      "hourStart": 8,
-      "arrival": {
-        "AB": 575,
-        "C": 20,
-        "D": 20,
-        "EF": 443,
-        "total": 1058
-      },
-      "departure": {
-        "AB": 1213,
-        "C": 1088,
-        "D": 1164,
-        "EF": 183,
-        "total": 3648
-      }
-    },
-    {
-      "hour": "09~10",
-      "hourStart": 9,
-      "arrival": {
-        "AB": 154,
-        "C": 0,
-        "D": 0,
-        "EF": 149,
-        "total": 303
-      },
-      "departure": {
-        "AB": 1108,
-        "C": 1021,
-        "D": 1064,
-        "EF": 172,
-        "total": 3365
-      }
-    },
-    {
-      "hour": "10~11",
-      "hourStart": 10,
-      "arrival": {
-        "AB": 351,
-        "C": 240,
-        "D": 96,
-        "EF": 459,
-        "total": 1146
-      },
-      "departure": {
-        "AB": 928,
-        "C": 883,
-        "D": 999,
-        "EF": 151,
-        "total": 2961
-      }
-    },
-    {
-      "hour": "11~12",
-      "hourStart": 11,
-      "arrival": {
-        "AB": 988,
-        "C": 702,
-        "D": 238,
-        "EF": 947,
-        "total": 2875
-      },
-      "departure": {
-        "AB": 776,
-        "C": 816,
-        "D": 857,
-        "EF": 124,
-        "total": 2573
-      }
-    },
-    {
-      "hour": "12~13",
-      "hourStart": 12,
-      "arrival": {
-        "AB": 392,
-        "C": 491,
-        "D": 491,
-        "EF": 709,
-        "total": 2083
-      },
-      "departure": {
-        "AB": 665,
-        "C": 762,
-        "D": 790,
-        "EF": 95,
-        "total": 2312
-      }
-    },
-    {
-      "hour": "13~14",
-      "hourStart": 13,
-      "arrival": {
-        "AB": 534,
-        "C": 278,
-        "D": 278,
-        "EF": 654,
-        "total": 1744
-      },
-      "departure": {
-        "AB": 669,
-        "C": 790,
-        "D": 892,
-        "EF": 124,
-        "total": 2475
-      }
-    },
-    {
-      "hour": "14~15",
-      "hourStart": 14,
-      "arrival": {
-        "AB": 1239,
-        "C": 486,
-        "D": 302,
-        "EF": 1100,
-        "total": 3127
-      },
-      "departure": {
-        "AB": 577,
-        "C": 641,
-        "D": 744,
-        "EF": 119,
-        "total": 2081
-      }
-    },
-    {
-      "hour": "15~16",
-      "hourStart": 15,
-      "arrival": {
-        "AB": 573,
-        "C": 465,
-        "D": 465,
-        "EF": 777,
-        "total": 2280
-      },
-      "departure": {
-        "AB": 695,
-        "C": 586,
-        "D": 583,
-        "EF": 97,
-        "total": 1961
-      }
-    },
-    {
-      "hour": "16~17",
-      "hourStart": 16,
-      "arrival": {
-        "AB": 2039,
-        "C": 270,
-        "D": 268,
-        "EF": 1198,
-        "total": 3775
-      },
-      "departure": {
-        "AB": 702,
-        "C": 500,
-        "D": 466,
-        "EF": 56,
-        "total": 1724
-      }
-    },
-    {
-      "hour": "17~18",
-      "hourStart": 17,
-      "arrival": {
-        "AB": 654,
-        "C": 99,
-        "D": 261,
-        "EF": 739,
-        "total": 1753
-      },
-      "departure": {
-        "AB": 663,
-        "C": 490,
-        "D": 510,
-        "EF": 58,
-        "total": 1721
-      }
-    },
-    {
-      "hour": "18~19",
-      "hourStart": 18,
-      "arrival": {
-        "AB": 1592,
-        "C": 43,
-        "D": 42,
-        "EF": 968,
-        "total": 2645
-      },
-      "departure": {
-        "AB": 569,
-        "C": 554,
-        "D": 624,
-        "EF": 98,
-        "total": 1845
-      }
-    },
-    {
-      "hour": "19~20",
-      "hourStart": 19,
-      "arrival": {
-        "AB": 1012,
-        "C": 533,
-        "D": 282,
-        "EF": 955,
-        "total": 2782
-      },
-      "departure": {
-        "AB": 0,
-        "C": 1082,
-        "D": 626,
-        "EF": 99,
-        "total": 1807
-      }
-    },
-    {
-      "hour": "20~21",
-      "hourStart": 20,
-      "arrival": {
-        "AB": 1096,
-        "C": 528,
-        "D": 83,
-        "EF": 582,
-        "total": 2289
-      },
-      "departure": {
-        "AB": 0,
-        "C": 1335,
-        "D": 0,
-        "EF": 84,
-        "total": 1419
-      }
-    },
-    {
-      "hour": "21~22",
-      "hourStart": 21,
-      "arrival": {
-        "AB": 621,
-        "C": 405,
-        "D": 405,
-        "EF": 541,
-        "total": 1972
-      },
-      "departure": {
-        "AB": 0,
-        "C": 1066,
-        "D": 0,
-        "EF": 78,
-        "total": 1144
-      }
-    },
-    {
-      "hour": "22~23",
-      "hourStart": 22,
-      "arrival": {
-        "AB": 958,
-        "C": 753,
-        "D": 313,
-        "EF": 912,
-        "total": 2936
-      },
-      "departure": {
-        "AB": 0,
-        "C": 605,
-        "D": 0,
-        "EF": 0,
-        "total": 605
-      }
-    },
-    {
-      "hour": "23~00",
-      "hourStart": 23,
-      "arrival": {
-        "AB": 147,
-        "C": 226,
-        "D": 0,
-        "EF": 0,
-        "total": 373
+        "total": 88
       },
       "departure": {
         "AB": 0,
@@ -433,6 +55,384 @@
         "D": 0,
         "EF": 0,
         "total": 207
+      }
+    },
+    {
+      "hour": "03~04",
+      "hourStart": 3,
+      "arrival": {
+        "AB": 75,
+        "C": 22,
+        "D": 0,
+        "EF": 0,
+        "total": 97
+      },
+      "departure": {
+        "AB": 0,
+        "C": 202,
+        "D": 0,
+        "EF": 0,
+        "total": 202
+      }
+    },
+    {
+      "hour": "04~05",
+      "hourStart": 4,
+      "arrival": {
+        "AB": 304,
+        "C": 142,
+        "D": 0,
+        "EF": 0,
+        "total": 446
+      },
+      "departure": {
+        "AB": 0,
+        "C": 855,
+        "D": 0,
+        "EF": 0,
+        "total": 855
+      }
+    },
+    {
+      "hour": "05~06",
+      "hourStart": 5,
+      "arrival": {
+        "AB": 941,
+        "C": 814,
+        "D": 0,
+        "EF": 0,
+        "total": 1755
+      },
+      "departure": {
+        "AB": 0,
+        "C": 2001,
+        "D": 0,
+        "EF": 94,
+        "total": 2095
+      }
+    },
+    {
+      "hour": "06~07",
+      "hourStart": 6,
+      "arrival": {
+        "AB": 752,
+        "C": 259,
+        "D": 635,
+        "EF": 0,
+        "total": 1646
+      },
+      "departure": {
+        "AB": 1127,
+        "C": 1323,
+        "D": 509,
+        "EF": 166,
+        "total": 3125
+      }
+    },
+    {
+      "hour": "07~08",
+      "hourStart": 7,
+      "arrival": {
+        "AB": 785,
+        "C": 189,
+        "D": 189,
+        "EF": 505,
+        "total": 1668
+      },
+      "departure": {
+        "AB": 1512,
+        "C": 1131,
+        "D": 1108,
+        "EF": 206,
+        "total": 3957
+      }
+    },
+    {
+      "hour": "08~09",
+      "hourStart": 8,
+      "arrival": {
+        "AB": 597,
+        "C": 20,
+        "D": 69,
+        "EF": 962,
+        "total": 1648
+      },
+      "departure": {
+        "AB": 1691,
+        "C": 1187,
+        "D": 1177,
+        "EF": 238,
+        "total": 4293
+      }
+    },
+    {
+      "hour": "09~10",
+      "hourStart": 9,
+      "arrival": {
+        "AB": 0,
+        "C": 0,
+        "D": 0,
+        "EF": 95,
+        "total": 95
+      },
+      "departure": {
+        "AB": 1247,
+        "C": 1039,
+        "D": 1101,
+        "EF": 184,
+        "total": 3571
+      }
+    },
+    {
+      "hour": "10~11",
+      "hourStart": 10,
+      "arrival": {
+        "AB": 594,
+        "C": 507,
+        "D": 97,
+        "EF": 764,
+        "total": 1962
+      },
+      "departure": {
+        "AB": 619,
+        "C": 817,
+        "D": 1078,
+        "EF": 127,
+        "total": 2641
+      }
+    },
+    {
+      "hour": "11~12",
+      "hourStart": 11,
+      "arrival": {
+        "AB": 591,
+        "C": 509,
+        "D": 245,
+        "EF": 962,
+        "total": 2307
+      },
+      "departure": {
+        "AB": 569,
+        "C": 630,
+        "D": 850,
+        "EF": 90,
+        "total": 2139
+      }
+    },
+    {
+      "hour": "12~13",
+      "hourStart": 12,
+      "arrival": {
+        "AB": 455,
+        "C": 237,
+        "D": 237,
+        "EF": 337,
+        "total": 1266
+      },
+      "departure": {
+        "AB": 624,
+        "C": 614,
+        "D": 790,
+        "EF": 68,
+        "total": 2096
+      }
+    },
+    {
+      "hour": "13~14",
+      "hourStart": 13,
+      "arrival": {
+        "AB": 666,
+        "C": 1,
+        "D": 1,
+        "EF": 555,
+        "total": 1223
+      },
+      "departure": {
+        "AB": 640,
+        "C": 670,
+        "D": 797,
+        "EF": 105,
+        "total": 2212
+      }
+    },
+    {
+      "hour": "14~15",
+      "hourStart": 14,
+      "arrival": {
+        "AB": 1273,
+        "C": 345,
+        "D": 160,
+        "EF": 730,
+        "total": 2508
+      },
+      "departure": {
+        "AB": 525,
+        "C": 603,
+        "D": 723,
+        "EF": 111,
+        "total": 1962
+      }
+    },
+    {
+      "hour": "15~16",
+      "hourStart": 15,
+      "arrival": {
+        "AB": 812,
+        "C": 338,
+        "D": 337,
+        "EF": 699,
+        "total": 2186
+      },
+      "departure": {
+        "AB": 647,
+        "C": 579,
+        "D": 617,
+        "EF": 84,
+        "total": 1927
+      }
+    },
+    {
+      "hour": "16~17",
+      "hourStart": 16,
+      "arrival": {
+        "AB": 1765,
+        "C": 154,
+        "D": 153,
+        "EF": 1271,
+        "total": 3343
+      },
+      "departure": {
+        "AB": 740,
+        "C": 531,
+        "D": 478,
+        "EF": 63,
+        "total": 1812
+      }
+    },
+    {
+      "hour": "17~18",
+      "hourStart": 17,
+      "arrival": {
+        "AB": 841,
+        "C": 115,
+        "D": 115,
+        "EF": 558,
+        "total": 1629
+      },
+      "departure": {
+        "AB": 539,
+        "C": 519,
+        "D": 475,
+        "EF": 52,
+        "total": 1585
+      }
+    },
+    {
+      "hour": "18~19",
+      "hourStart": 18,
+      "arrival": {
+        "AB": 1482,
+        "C": 4,
+        "D": 3,
+        "EF": 592,
+        "total": 2081
+      },
+      "departure": {
+        "AB": 417,
+        "C": 533,
+        "D": 545,
+        "EF": 70,
+        "total": 1565
+      }
+    },
+    {
+      "hour": "19~20",
+      "hourStart": 19,
+      "arrival": {
+        "AB": 768,
+        "C": 19,
+        "D": 19,
+        "EF": 937,
+        "total": 1743
+      },
+      "departure": {
+        "AB": 0,
+        "C": 914,
+        "D": 621,
+        "EF": 77,
+        "total": 1612
+      }
+    },
+    {
+      "hour": "20~21",
+      "hourStart": 20,
+      "arrival": {
+        "AB": 1024,
+        "C": 494,
+        "D": 2,
+        "EF": 538,
+        "total": 2058
+      },
+      "departure": {
+        "AB": 0,
+        "C": 1121,
+        "D": 0,
+        "EF": 74,
+        "total": 1195
+      }
+    },
+    {
+      "hour": "21~22",
+      "hourStart": 21,
+      "arrival": {
+        "AB": 709,
+        "C": 360,
+        "D": 360,
+        "EF": 593,
+        "total": 2022
+      },
+      "departure": {
+        "AB": 0,
+        "C": 764,
+        "D": 0,
+        "EF": 51,
+        "total": 815
+      }
+    },
+    {
+      "hour": "22~23",
+      "hourStart": 22,
+      "arrival": {
+        "AB": 881,
+        "C": 247,
+        "D": 76,
+        "EF": 725,
+        "total": 1929
+      },
+      "departure": {
+        "AB": 0,
+        "C": 386,
+        "D": 0,
+        "EF": 0,
+        "total": 386
+      }
+    },
+    {
+      "hour": "23~00",
+      "hourStart": 23,
+      "arrival": {
+        "AB": 125,
+        "C": 327,
+        "D": 0,
+        "EF": 0,
+        "total": 452
+      },
+      "departure": {
+        "AB": 0,
+        "C": 6,
+        "D": 0,
+        "EF": 0,
+        "total": 6
       }
     }
   ]
