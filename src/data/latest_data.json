@@ -1,17 +1,17 @@
 {
   "date": "2026-06-21",
   "terminal": "T1",
-  "lastUpdated": "2026-06-21T15:07:55.308826",
+  "lastUpdated": "2026-06-21T15:49:31.247982",
   "hourlyData": [
     {
       "hour": "00~01",
       "hourStart": 0,
       "arrival": {
         "AB": 93,
-        "C": 382,
+        "C": 260,
         "D": 0,
         "EF": 0,
-        "total": 475
+        "total": 353
       },
       "departure": {
         "AB": 0,
@@ -393,10 +393,10 @@
       },
       "departure": {
         "AB": 0,
-        "C": 796,
+        "C": 835,
         "D": 0,
-        "EF": 69,
-        "total": 865
+        "EF": 82,
+        "total": 917
       }
     },
     {
@@ -411,10 +411,10 @@
       },
       "departure": {
         "AB": 0,
-        "C": 306,
+        "C": 537,
         "D": 0,
         "EF": 0,
-        "total": 306
+        "total": 537
       }
     },
     {
@@ -429,10 +429,10 @@
       },
       "departure": {
         "AB": 0,
-        "C": 6,
+        "C": 393,
         "D": 0,
         "EF": 0,
-        "total": 6
+        "total": 393
       }
     }
   ]
