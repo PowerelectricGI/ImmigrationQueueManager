@@ -1,17 +1,17 @@
 {
-  "id": "20260721201454",
-  "lastUpdated": "2026-07-21T20:14:54.565405",
+  "id": "20260721215719",
+  "lastUpdated": "2026-07-21T21:57:19.155543",
   "shortTerm": {
     "floor1": {
-      "available": 657,
+      "available": 521,
       "name": "지상 1층"
     },
     "basement1": {
-      "available": 125,
+      "available": 78,
       "name": "지하 1층"
     },
     "basement2": {
-      "available": 811,
+      "available": 720,
       "name": "지하 2층"
     }
   },
